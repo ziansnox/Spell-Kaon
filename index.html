@@ -1,634 +1,1752 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SPELL & KAON - Book + Total</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#FFF8E8;--green:#5CC97B;--dark-green:#2D6A4F;--yellow:#FFD93D;--orange:#FF8C42;--red:#FF5A5F;--brown:#5D4037;--cream:#FFF5D6;--shadow:0 8px 0 rgba(0,0,0,0.15);}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Fredoka',sans-serif;}
-body{background:var(--bg);overflow-x:hidden;min-height:100vh;color:var(--brown);display:flex;flex-direction:column;}
-button{cursor:pointer;border:none;outline:none;}input{outline:none;}
-#lobby{flex:1;min-height:calc(100vh - 48px);display:flex;flex-wrap:wrap;padding:14px 18px 10px;gap:18px;background:radial-gradient(circle at 20% 20%, #FFE9A8 0%, transparent 40%),radial-gradient(circle at 80% 80%, #C6F0C6 0%, transparent 40%),var(--bg);}
-.lobby-left{flex:1.2;min-width:320px;max-width:640px;} .lobby-right{flex:1;min-width:300px;max-width:520px;}
-.logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(36px,6vw,60px);line-height:0.9;letter-spacing:-1px;}
-.logo span:first-child{color:var(--green);} .logo span:last-child{color:var(--orange);}
-.logo small{display:block;font-size:12px;letter-spacing:1px;color:var(--brown);opacity:0.7;margin-top:4px;font-weight:600;}
-.card{background:white;border-radius:22px;border:3px solid var(--brown);box-shadow:var(--shadow);padding:18px;}
-.setup-card{margin-top:12px;}
-.section-label{font-weight:700;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;opacity:0.6;margin-bottom:6px;margin-top:12px;}
-.name-input{width:100%;font-size:20px;font-weight:600;padding:12px 14px;border-radius:11px;border:3px solid var(--brown);background:var(--cream);}
-.name-input:focus{border-color:var(--green);background:white;}
-.progress-box{background:linear-gradient(135deg,#E8FFE8,#D0F0FF);border:3px solid var(--brown);border-radius:14px;padding:12px;margin-top:10px;display:none;}
-.progress-box.show{display:block;}
-.progress-title{font-family:'Nunito';font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
-.progress-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
-.prog-stat{background:white;border:2px solid var(--brown);border-radius:10px;padding:8px;text-align:center;}
-.prog-stat.easy{border-color:#5CC97B;} .prog-stat.normal{border-color:#E6B800;} .prog-stat.hard{border-color:#FF5A5F;}
-.prog-stat b{font-family:'Nunito';font-size:18px;display:block;}
-.prog-stat span{font-size:10px;letter-spacing:0.8px;text-transform:uppercase;opacity:0.6;font-weight:700;}
-.prog-stat.best{transform:scale(1.05);box-shadow:0 3px 0 rgba(0,0,0,0.1);}
-.total-row{margin-top:8px;background:var(--brown);color:white;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:900;}
-.total-row b{font-size:20px;}
-.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.lang-btn{padding:9px;border-radius:10px;border:3px solid var(--brown);background:white;font-weight:700;font-size:13px;transition:.15s;text-align:left;}
-.lang-btn.active{background:var(--yellow);transform:translateY(-1px);box-shadow:0 2px 0 rgba(0,0,0,0.15);}
-.device-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.device-card{border:3px solid var(--brown);border-radius:12px;padding:11px;background:white;text-align:center;transition:.15s;cursor:pointer;}
-.device-card.active{background:var(--green);color:white;transform:translateY(-1px);box-shadow:0 3px 0 rgba(0,0,0,0.2);}
-.device-card .ico{font-size:24px;display:block;margin-bottom:3px;} .device-card b{font-size:14px;} .device-card span{font-size:11px;opacity:0.8;}
-.level-grid{display:grid;grid-template-columns:1fr;gap:8px;}
-@media(min-width:540px){.level-grid{grid-template-columns:1fr 1fr 1fr;}}
-.level-card{border:3px solid var(--brown);border-radius:12px;padding:10px 8px;background:white;text-align:left;transition:.15s;cursor:pointer;position:relative;overflow:hidden;}
-.level-card .lvl-ico{font-size:20px;display:block;margin-bottom:2px;} .level-card b{font-size:13px;font-family:'Nunito';font-weight:900;line-height:1.1;} .level-card p{font-size:11px;opacity:0.7;line-height:1.25;margin-top:3px;min-height:30px;}
-.level-card .lvl-tag{position:absolute;top:5px;right:5px;font-size:9px;font-weight:900;letter-spacing:0.6px;padding:2px 5px;border-radius:8px;border:2px solid var(--brown);}
-.level-card .lvl-points{margin-top:5px;font-size:10px;font-weight:800;background:var(--cream);border-radius:6px;padding:3px 6px;display:inline-block;}
-.level-card.easy .lvl-tag{background:#C6F5D1;} .level-card.normal .lvl-tag{background:#FFE9A8;} .level-card.hard .lvl-tag{background:#FFB4B4;}
-.level-card.active{transform:translateY(-1px);box-shadow:0 4px 0 rgba(0,0,0,0.2);}
-.level-card.easy.active{background:linear-gradient(135deg,#D9FFE2,#A0E8AF);} .level-card.normal.active{background:linear-gradient(135deg,#FFF1B8,#FFD93D);} .level-card.hard.active{background:linear-gradient(135deg,#FFD0D0,#FF8A8A);}
-.play-btn{width:100%;margin-top:12px;background:var(--orange);color:white;border:3px solid var(--brown);border-radius:12px;padding:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;letter-spacing:1px;box-shadow:var(--shadow);transition:.1s;}
-.play-btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,0.15);} .play-btn:disabled{opacity:0.4;filter:grayscale(1);cursor:not-allowed;}
-.secondary-btn{width:100%;margin-top:8px;background:white;color:var(--brown);border:3px solid var(--brown);border-radius:12px;padding:11px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,0.12);transition:.1s;display:flex;align-items:center;justify-content:center;gap:6px;}
-.secondary-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,0.12);}
-.note-box{margin-top:10px;background:var(--cream);border:2px dashed var(--brown);border-radius:9px;padding:10px 11px;font-size:12px;line-height:1.35;}
-.leader-card{position:sticky;top:14px;}
-.leader-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
-.leader-head h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;}
-.badge{background:var(--brown);color:white;font-size:10px;padding:3px 7px;border-radius:20px;font-weight:700;}
-.leader-list{max-height:60vh;overflow:auto;padding-right:2px;}
-.leader-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:6px;padding:8px 9px;border-radius:8px;margin-bottom:5px;background:#FFF8E8;border:2px solid transparent;font-size:13px;}
-.leader-row.top1{background:linear-gradient(90deg,#FFD93D,#FFF3B0);border-color:#E6B800;font-weight:700;} .leader-row.top2{background:linear-gradient(90deg,#E8E8E8,#FFFFFF);border-color:#AAA;} .leader-row.top3{background:linear-gradient(90deg,#FFB68B,#FFE3D0);border-color:#D67C4A;}
-.rank{font-family:'Nunito';font-weight:900;font-size:15px;text-align:center;} .leader-meta{font-size:10px;opacity:0.6;margin-top:1px;} .leader-score{font-family:'Nunito';font-weight:900;font-size:15px;color:var(--dark-green);text-align:right;}
-.leader-breakdown{font-size:9px;opacity:0.8;margin-top:2px;background:white;border-radius:5px;padding:1px 5px;display:inline-block;border:1px solid #ccc;}
-#gameScreen{display:none;min-height:100vh;flex-direction:column;background:radial-gradient(circle at 10% 10%, #FFE9A8 0%, transparent 30%),radial-gradient(circle at 90% 90%, #B8E6B8 0%, transparent 30%),var(--bg);padding:10px;}
-.top-hud{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap;}
-.hud-left-col{display:flex;flex-direction:column;gap:5px;min-width:130px;}
-.hud-box{background:white;border:3px solid var(--brown);border-radius:11px;padding:7px 10px;box-shadow:0 2px 0 rgba(0,0,0,0.12);display:flex;align-items:center;gap:4px;font-weight:700;font-size:14px;}
-.hearts{font-size:16px;letter-spacing:1px;} .hearts .lost{filter:grayscale(1);opacity:0.25;}
-.progress-wrap{flex:1;min-width:140px;background:white;border:3px solid var(--brown);border-radius:11px;padding:3px;box-shadow:0 2px 0 rgba(0,0,0,0.12);position:relative;overflow:hidden;align-self:center;}
-.progress-track{height:14px;background:#FFE6E6;border-radius:6px;overflow:hidden;}
-.progress-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--green),#8AE8A0);transition:width 0.1s linear;}
-.progress-fill.warn{background:linear-gradient(90deg,var(--orange),var(--red));}
-.timer-text{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Nunito';font-weight:900;font-size:11px;}
-.leave-btn{background:white;border:3px solid var(--brown);border-radius:8px;padding:5px 10px;font-weight:800;font-size:11px;box-shadow:0 2px 0 rgba(0,0,0,0.12);display:flex;align-items:center;gap:3px;transition:.1s;width:fit-content;}
-.level-badge-hud{background:var(--brown);color:white;font-size:9px;font-weight:900;letter-spacing:1px;padding:4px 8px;border-radius:20px;align-self:center;}
-.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px 4px;position:relative;}
-.plate-wrap{position:relative;width:clamp(160px,28vw,260px);height:clamp(160px,28vw,260px);display:flex;align-items:center;justify-content:center;}
-.plate{position:absolute;width:100%;height:100%;background:radial-gradient(circle at 40% 40%, white 0%, #F5E6C8 65%, #E6C89A 100%);border-radius:50%;border:4px solid var(--brown);box-shadow:0 9px 0 rgba(0,0,0,0.12), inset 0 -7px 14px rgba(0,0,0,0.08);}
-.food-display{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);}
-.food-emoji{font-size:clamp(60px,10vw,96px);filter:drop-shadow(0 5px 7px rgba(0,0,0,0.2));line-height:1;}
-.food-img{width:clamp(84px,13vw,124px);height:clamp(84px,13vw,124px);object-fit:contain;filter:drop-shadow(0 5px 7px rgba(0,0,0,0.2));border-radius:12px;background:white;border:3px solid var(--brown);padding:4px;}
-.food-display.eating{animation:eatPop 0.42s ease;} .food-display.trashing{animation:trashThrow 0.7s cubic-bezier(.7,0,.84,0) forwards;}
-@keyframes eatPop{0%{transform:scale(1);}30%{transform:scale(1.18) rotate(-4deg);}60%{transform:scale(0.18) translateY(14px);}100%{transform:scale(0);}}
-@keyframes trashThrow{0%{transform:translate(0,0) rotate(0) scale(1);}40%{transform:translate(60px,-45px) rotate(18deg) scale(0.88);}100%{transform:translate(320px,220px) rotate(150deg) scale(0.18);opacity:0;}}
-@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
-.word-hint{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap;justify-content:center;max-width:94vw;}
-.letter-box{width:30px;height:36px;border:2px solid var(--brown);border-radius:6px;background:white;display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:900;font-size:15px;text-transform:uppercase;box-shadow:0 2px 0 rgba(0,0,0,0.12);}
-.letter-box.filled{background:var(--cream);border-color:var(--green);} .letter-box.wrong{border-color:var(--red);background:#FFE0E0;animation:shake 0.28s;}
-.input-area{margin-top:10px;width:100%;max-width:380px;}
-.main-input{width:100%;text-align:center;font-size:22px;font-weight:800;letter-spacing:1px;padding:10px 15px;border-radius:11px;border:3px solid var(--brown);background:white;text-transform:lowercase;box-shadow:0 3px 0 rgba(0,0,0,0.12);}
-.main-input:focus{border-color:var(--green);}
-.trash-bin{position:absolute;right:8px;bottom:8px;width:80px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:5;}
-.trash-ico{font-size:46px;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.2));transition:.2s;}
-.trash-bin.active .trash-ico{transform:scale(1.1) rotate(-4deg);}
-.trash-count{margin-top:1px;background:var(--brown);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
-.feedback{height:20px;margin-top:6px;font-weight:800;font-size:14px;text-align:center;min-height:18px;}
-.feedback.ok{color:var(--dark-green);} .feedback.bad{color:var(--red);}
-.virtual-kb{display:none;width:100%;max-width:460px;margin:8px auto 0;background:white;border:3px solid var(--brown);border-radius:12px;padding:5px;box-shadow:0 3px 0 rgba(0,0,0,0.15);}
-.phone-mode .virtual-kb{display:block;}
-.kb-row{display:flex;justify-content:center;gap:3px;margin-bottom:3px;}
-.kb-key{flex:1;min-width:22px;max-width:36px;height:34px;border-radius:6px;border:2px solid var(--brown);background:var(--cream);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
-.kb-key.wide{max-width:56px;background:var(--yellow);} 
-#gameOver{display:none;min-height:100vh;align-items:center;justify-content:center;padding:14px;background:radial-gradient(circle at center, #FFE9A8 0%, #C6F0C6 100%);}
-.over-card{max-width:500px;width:100%;text-align:center;}
-.big-emoji{font-size:58px;margin-bottom:3px;}
-.over-title{font-family:'Nunito';font-weight:900;font-size:28px;line-height:0.9;}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:10px 0;}
-.stat{background:var(--cream);border:2px solid var(--brown);border-radius:9px;padding:8px;}
-.stat b{font-family:'Nunito';font-size:18px;display:block;} .stat span{font-size:9px;letter-spacing:0.7px;text-transform:uppercase;opacity:0.6;font-weight:700;}
-.total-display{background:linear-gradient(135deg,var(--brown),#8D6E63);color:white;border-radius:14px;padding:12px;margin:10px 0;border:3px solid var(--brown);box-shadow:var(--shadow);}
-.total-display b{font-family:'Nunito';font-size:28px;display:block;}
-.total-display span{font-size:10px;letter-spacing:1px;opacity:0.8;}
 
-/* BOOK SCREEN */
-#bookScreen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(50,30,10,0.75);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:12px;}
-.book-container{max-width:940px;width:100%;max-height:92vh;background:#FFF8E8;border:4px solid var(--brown);border-radius:22px;box-shadow:0 12px 0 rgba(0,0,0,0.25);display:flex;flex-direction:column;overflow:hidden;}
-.book-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:white;border-bottom:3px solid var(--brown);}
-.book-header h2{font-family:'Nunito';font-weight:900;font-size:20px;}
-.book-header button{background:var(--red);color:white;border:3px solid var(--brown);border-radius:10px;padding:6px 12px;font-weight:800;font-size:12px;box-shadow:0 3px 0 rgba(0,0,0,0.2);}
-.book-controls{display:flex;gap:8px;padding:10px 14px;background:var(--cream);border-bottom:3px solid var(--brown);flex-wrap:wrap;align-items:center;}
-.book-tab{padding:8px 13px;border-radius:10px;border:3px solid var(--brown);background:white;font-weight:800;font-size:13px;transition:.12s;}
-.book-tab.active{background:var(--yellow);transform:translateY(-1px);box-shadow:0 3px 0 rgba(0,0,0,0.15);}
-.book-search{flex:1;min-width:160px;padding:8px 11px;border-radius:10px;border:3px solid var(--brown);font-weight:600;font-size:14px;background:white;}
-.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:14px;overflow:auto;flex:1;background:radial-gradient(circle at 20% 20%, #FFE9A8 0%, transparent 50%),var(--bg);}
-.book-card{background:white;border:3px solid var(--brown);border-radius:14px;padding:10px;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,0.12);transition:.12s;position:relative;}
-.book-card:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,0.12);}
-.book-card img{width:72px;height:72px;object-fit:contain;display:block;margin:0 auto 6px;background:white;border-radius:10px;border:2px solid var(--brown);padding:4px;}
-.book-card .b-emoji{font-size:48px;display:block;line-height:1;margin-bottom:4px;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.15));}
-.book-card b{display:block;font-size:14px;text-transform:lowercase;font-weight:800;letter-spacing:0.3px;word-break:break-word;}
-.book-card .lvl{margin-top:4px;font-size:9px;font-weight:900;letter-spacing:0.6px;padding:2px 6px;border-radius:10px;border:2px solid var(--brown);display:inline-block;}
-.book-card .lvl.easy{background:#C6F5D1;} .book-card .lvl.normal{background:#FFE9A8;} .book-card .lvl.hard{background:#FFB4B4;}
-.book-count{font-size:12px;font-weight:700;opacity:0.6;}
-.site-footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:8px 8px;background:var(--brown);color:var(--cream);font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;letter-spacing:1px;border-top:3px solid var(--yellow);z-index:50;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 -4px 0 rgba(0,0,0,0.15);}
-.site-footer span{color:var(--yellow);}
-/* add bottom padding to lobby so content not hidden behind fixed footer */
-#lobby{padding-bottom:48px !important;}
-#bookScreen{padding-bottom:48px;}
-#gameScreen{padding-bottom:48px;}
-#gameOver{padding-bottom:48px;}
-</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SPELL & KAON - Book + Total</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFF8E8;
+      --green: #5CC97B;
+      --dark-green: #2D6A4F;
+      --yellow: #FFD93D;
+      --orange: #FF8C42;
+      --red: #FF5A5F;
+      --brown: #5D4037;
+      --cream: #FFF5D6;
+      --shadow: 0 8px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      overflow-x: hidden;
+      min-height: 100vh;
+      color: var(--brown);
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    input {
+      outline: none;
+    }
+
+    #lobby {
+      flex: 1;
+      min-height: calc(100vh - 48px);
+      display: flex;
+      flex-wrap: wrap;
+      padding: 14px 18px 10px;
+      gap: 18px;
+      background: radial-gradient(circle at 20% 20%, #FFE9A8 0%, transparent 40%), radial-gradient(circle at 80% 80%, #C6F0C6 0%, transparent 40%), var(--bg);
+    }
+
+    .lobby-left {
+      flex: 1.2;
+      min-width: 320px;
+      max-width: 640px;
+    }
+
+    .lobby-right {
+      flex: 1;
+      min-width: 300px;
+      max-width: 520px;
+    }
+
+    .logo {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: clamp(36px, 6vw, 60px);
+      line-height: 0.9;
+      letter-spacing: -1px;
+    }
+
+    .logo span:first-child {
+      color: var(--green);
+    }
+
+    .logo span:last-child {
+      color: var(--orange);
+    }
+
+    .logo small {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--brown);
+      opacity: 0.7;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      border: 3px solid var(--brown);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .setup-card {
+      margin-top: 12px;
+    }
+
+    .section-label {
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+
+    .name-input {
+      width: 100%;
+      font-size: 20px;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-radius: 11px;
+      border: 3px solid var(--brown);
+      background: var(--cream);
+    }
+
+    .name-input:focus {
+      border-color: var(--green);
+      background: white;
+    }
+
+    .progress-box {
+      background: linear-gradient(135deg, #E8FFE8, #D0F0FF);
+      border: 3px solid var(--brown);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .progress-box.show {
+      display: block;
+    }
+
+    .progress-title {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .progress-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .prog-stat {
+      background: white;
+      border: 2px solid var(--brown);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .prog-stat.easy {
+      border-color: #5CC97B;
+    }
+
+    .prog-stat.normal {
+      border-color: #E6B800;
+    }
+
+    .prog-stat.hard {
+      border-color: #FF5A5F;
+    }
+
+    .prog-stat b {
+      font-family: 'Nunito';
+      font-size: 18px;
+      display: block;
+    }
+
+    .prog-stat span {
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      font-weight: 700;
+    }
+
+    .prog-stat.best {
+      transform: scale(1.05);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .total-row {
+      margin-top: 8px;
+      background: var(--brown);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+    }
+
+    .total-row b {
+      font-size: 20px;
+    }
+
+    .lang-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .lang-btn {
+      padding: 9px;
+      border-radius: 10px;
+      border: 3px solid var(--brown);
+      background: white;
+      font-weight: 700;
+      font-size: 13px;
+      transition: .15s;
+      text-align: left;
+    }
+
+    .lang-btn.active {
+      background: var(--yellow);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .device-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .device-card {
+      border: 3px solid var(--brown);
+      border-radius: 12px;
+      padding: 11px;
+      background: white;
+      text-align: center;
+      transition: .15s;
+      cursor: pointer;
+    }
+
+    .device-card.active {
+      background: var(--green);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .device-card .ico {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .device-card b {
+      font-size: 14px;
+    }
+
+    .device-card span {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    @media(min-width:540px) {
+      .level-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .level-card {
+      border: 3px solid var(--brown);
+      border-radius: 12px;
+      padding: 10px 8px;
+      background: white;
+      text-align: left;
+      transition: .15s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .level-card .lvl-ico {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .level-card b {
+      font-size: 13px;
+      font-family: 'Nunito';
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .level-card p {
+      font-size: 11px;
+      opacity: 0.7;
+      line-height: 1.25;
+      margin-top: 3px;
+      min-height: 30px;
+    }
+
+    .level-card .lvl-tag {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      padding: 2px 5px;
+      border-radius: 8px;
+      border: 2px solid var(--brown);
+    }
+
+    .level-card .lvl-points {
+      margin-top: 5px;
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--cream);
+      border-radius: 6px;
+      padding: 3px 6px;
+      display: inline-block;
+    }
+
+    .level-card.easy .lvl-tag {
+      background: #C6F5D1;
+    }
+
+    .level-card.normal .lvl-tag {
+      background: #FFE9A8;
+    }
+
+    .level-card.hard .lvl-tag {
+      background: #FFB4B4;
+    }
+
+    .level-card.active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .level-card.easy.active {
+      background: linear-gradient(135deg, #D9FFE2, #A0E8AF);
+    }
+
+    .level-card.normal.active {
+      background: linear-gradient(135deg, #FFF1B8, #FFD93D);
+    }
+
+    .level-card.hard.active {
+      background: linear-gradient(135deg, #FFD0D0, #FF8A8A);
+    }
+
+    .play-btn {
+      width: 100%;
+      margin-top: 12px;
+      background: var(--orange);
+      color: white;
+      border: 3px solid var(--brown);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 1px;
+      box-shadow: var(--shadow);
+      transition: .1s;
+    }
+
+    .play-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .play-btn:disabled {
+      opacity: 0.4;
+      filter: grayscale(1);
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: white;
+      color: var(--brown);
+      border: 3px solid var(--brown);
+      border-radius: 12px;
+      padding: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+      transition: .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .secondary-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .note-box {
+      margin-top: 10px;
+      background: var(--cream);
+      border: 2px dashed var(--brown);
+      border-radius: 9px;
+      padding: 10px 11px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .leader-card {
+      position: sticky;
+      top: 14px;
+    }
+
+    .leader-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 9px;
+    }
+
+    .leader-head h3 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .badge {
+      background: var(--brown);
+      color: white;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .leader-list {
+      max-height: 60vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .leader-row {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 9px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      background: #FFF8E8;
+      border: 2px solid transparent;
+      font-size: 13px;
+    }
+
+    .leader-row.top1 {
+      background: linear-gradient(90deg, #FFD93D, #FFF3B0);
+      border-color: #E6B800;
+      font-weight: 700;
+    }
+
+    .leader-row.top2 {
+      background: linear-gradient(90deg, #E8E8E8, #FFFFFF);
+      border-color: #AAA;
+    }
+
+    .leader-row.top3 {
+      background: linear-gradient(90deg, #FFB68B, #FFE3D0);
+      border-color: #D67C4A;
+    }
+
+    .rank {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .leader-meta {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-top: 1px;
+    }
+
+    .leader-score {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--dark-green);
+      text-align: right;
+    }
+
+    .leader-breakdown {
+      font-size: 9px;
+      opacity: 0.8;
+      margin-top: 2px;
+      background: white;
+      border-radius: 5px;
+      padding: 1px 5px;
+      display: inline-block;
+      border: 1px solid #ccc;
+    }
+
+    #gameScreen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      background: radial-gradient(circle at 10% 10%, #FFE9A8 0%, transparent 30%), radial-gradient(circle at 90% 90%, #B8E6B8 0%, transparent 30%), var(--bg);
+      padding: 10px;
+    }
+
+    .top-hud {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .hud-left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 130px;
+    }
+
+    .hud-box {
+      background: white;
+      border: 3px solid var(--brown);
+      border-radius: 11px;
+      padding: 7px 10px;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .hearts {
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+
+    .hearts .lost {
+      filter: grayscale(1);
+      opacity: 0.25;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      min-width: 140px;
+      background: white;
+      border: 3px solid var(--brown);
+      border-radius: 11px;
+      padding: 3px;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+      position: relative;
+      overflow: hidden;
+      align-self: center;
+    }
+
+    .progress-track {
+      height: 14px;
+      background: #FFE6E6;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--green), #8AE8A0);
+      transition: width 0.1s linear;
+    }
+
+    .progress-fill.warn {
+      background: linear-gradient(90deg, var(--orange), var(--red));
+    }
+
+    .timer-text {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 11px;
+    }
+
+    .leave-btn {
+      background: white;
+      border: 3px solid var(--brown);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-weight: 800;
+      font-size: 11px;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      transition: .1s;
+      width: fit-content;
+    }
+
+    .level-badge-hud {
+      background: var(--brown);
+      color: white;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      align-self: center;
+    }
+
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 6px 4px;
+      position: relative;
+    }
+
+    .plate-wrap {
+      position: relative;
+      width: clamp(160px, 28vw, 260px);
+      height: clamp(160px, 28vw, 260px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .plate {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 40% 40%, white 0%, #F5E6C8 65%, #E6C89A 100%);
+      border-radius: 50%;
+      border: 4px solid var(--brown);
+      box-shadow: 0 9px 0 rgba(0, 0, 0, 0.12), inset 0 -7px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .food-display {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .food-emoji {
+      font-size: clamp(60px, 10vw, 96px);
+      filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.2));
+      line-height: 1;
+    }
+
+    .food-img {
+      width: clamp(84px, 13vw, 124px);
+      height: clamp(84px, 13vw, 124px);
+      object-fit: contain;
+      filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.2));
+      border-radius: 12px;
+      background: white;
+      border: 3px solid var(--brown);
+      padding: 4px;
+    }
+
+    .food-display.eating {
+      animation: eatPop 0.42s ease;
+    }
+
+    .food-display.trashing {
+      animation: trashThrow 0.7s cubic-bezier(.7, 0, .84, 0) forwards;
+    }
+
+    @keyframes eatPop {
+      0% {
+        transform: scale(1);
+      }
+
+      30% {
+        transform: scale(1.18) rotate(-4deg);
+      }
+
+      60% {
+        transform: scale(0.18) translateY(14px);
+      }
+
+      100% {
+        transform: scale(0);
+      }
+    }
+
+    @keyframes trashThrow {
+      0% {
+        transform: translate(0, 0) rotate(0) scale(1);
+      }
+
+      40% {
+        transform: translate(60px, -45px) rotate(18deg) scale(0.88);
+      }
+
+      100% {
+        transform: translate(320px, 220px) rotate(150deg) scale(0.18);
+        opacity: 0;
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-5px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(5px);
+      }
+    }
+
+    .word-hint {
+      display: flex;
+      gap: 4px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 94vw;
+    }
+
+    .letter-box {
+      width: 30px;
+      height: 36px;
+      border: 2px solid var(--brown);
+      border-radius: 6px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 15px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .letter-box.filled {
+      background: var(--cream);
+      border-color: var(--green);
+    }
+
+    .letter-box.wrong {
+      border-color: var(--red);
+      background: #FFE0E0;
+      animation: shake 0.28s;
+    }
+
+    .input-area {
+      margin-top: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .main-input {
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 10px 15px;
+      border-radius: 11px;
+      border: 3px solid var(--brown);
+      background: white;
+      text-transform: lowercase;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .main-input:focus {
+      border-color: var(--green);
+    }
+
+    .trash-bin {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 5;
+    }
+
+    .trash-ico {
+      font-size: 46px;
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+      transition: .2s;
+    }
+
+    .trash-bin.active .trash-ico {
+      transform: scale(1.1) rotate(-4deg);
+    }
+
+    .trash-count {
+      margin-top: 1px;
+      background: var(--brown);
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .feedback {
+      height: 20px;
+      margin-top: 6px;
+      font-weight: 800;
+      font-size: 14px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .feedback.ok {
+      color: var(--dark-green);
+    }
+
+    .feedback.bad {
+      color: var(--red);
+    }
+
+    .virtual-kb {
+      display: none;
+      width: 100%;
+      max-width: 460px;
+      margin: 8px auto 0;
+      background: white;
+      border: 3px solid var(--brown);
+      border-radius: 12px;
+      padding: 5px;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .phone-mode .virtual-kb {
+      display: block;
+    }
+
+    .kb-row {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin-bottom: 3px;
+    }
+
+    .kb-key {
+      flex: 1;
+      min-width: 22px;
+      max-width: 36px;
+      height: 34px;
+      border-radius: 6px;
+      border: 2px solid var(--brown);
+      background: var(--cream);
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kb-key.wide {
+      max-width: 56px;
+      background: var(--yellow);
+    }
+
+    #gameOver {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background: radial-gradient(circle at center, #FFE9A8 0%, #C6F0C6 100%);
+    }
+
+    .over-card {
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .big-emoji {
+      font-size: 58px;
+      margin-bottom: 3px;
+    }
+
+    .over-title {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 28px;
+      line-height: 0.9;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 5px;
+      margin: 10px 0;
+    }
+
+    .stat {
+      background: var(--cream);
+      border: 2px solid var(--brown);
+      border-radius: 9px;
+      padding: 8px;
+    }
+
+    .stat b {
+      font-family: 'Nunito';
+      font-size: 18px;
+      display: block;
+    }
+
+    .stat span {
+      font-size: 9px;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      font-weight: 700;
+    }
+
+    .total-display {
+      background: linear-gradient(135deg, var(--brown), #8D6E63);
+      color: white;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 10px 0;
+      border: 3px solid var(--brown);
+      box-shadow: var(--shadow);
+    }
+
+    .total-display b {
+      font-family: 'Nunito';
+      font-size: 28px;
+      display: block;
+    }
+
+    .total-display span {
+      font-size: 10px;
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+
+    /* BOOK SCREEN */
+    #bookScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(50, 30, 10, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .book-container {
+      max-width: 940px;
+      width: 100%;
+      max-height: 92vh;
+      background: #FFF8E8;
+      border: 4px solid var(--brown);
+      border-radius: 22px;
+      box-shadow: 0 12px 0 rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .book-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: white;
+      border-bottom: 3px solid var(--brown);
+    }
+
+    .book-header h2 {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .book-header button {
+      background: var(--red);
+      color: white;
+      border: 3px solid var(--brown);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-weight: 800;
+      font-size: 12px;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .book-controls {
+      display: flex;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--cream);
+      border-bottom: 3px solid var(--brown);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .book-tab {
+      padding: 8px 13px;
+      border-radius: 10px;
+      border: 3px solid var(--brown);
+      background: white;
+      font-weight: 800;
+      font-size: 13px;
+      transition: .12s;
+    }
+
+    .book-tab.active {
+      background: var(--yellow);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .book-search {
+      flex: 1;
+      min-width: 160px;
+      padding: 8px 11px;
+      border-radius: 10px;
+      border: 3px solid var(--brown);
+      font-weight: 600;
+      font-size: 14px;
+      background: white;
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      padding: 14px;
+      overflow: auto;
+      flex: 1;
+      background: radial-gradient(circle at 20% 20%, #FFE9A8 0%, transparent 50%), var(--bg);
+    }
+
+    .book-card {
+      background: white;
+      border: 3px solid var(--brown);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+      transition: .12s;
+      position: relative;
+    }
+
+    .book-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .book-card img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 6px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid var(--brown);
+      padding: 4px;
+    }
+
+    .book-card .b-emoji {
+      font-size: 48px;
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.15));
+    }
+
+    .book-card b {
+      display: block;
+      font-size: 14px;
+      text-transform: lowercase;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      word-break: break-word;
+    }
+
+    .book-card .lvl {
+      margin-top: 4px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid var(--brown);
+      display: inline-block;
+    }
+
+    .book-card .lvl.easy {
+      background: #C6F5D1;
+    }
+
+    .book-card .lvl.normal {
+      background: #FFE9A8;
+    }
+
+    .book-card .lvl.hard {
+      background: #FFB4B4;
+    }
+
+    .book-count {
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0.6;
+    }
+
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 8px 8px;
+      background: var(--brown);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 1px;
+      border-top: 3px solid var(--yellow);
+      z-index: 50;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .site-footer span {
+      color: var(--yellow);
+    }
+
+    /* add bottom padding to lobby so content not hidden behind fixed footer */
+    #lobby {
+      padding-bottom: 48px !important;
+    }
+
+    #bookScreen {
+      padding-bottom: 48px;
+    }
+
+    #gameScreen {
+      padding-bottom: 48px;
+    }
+
+    #gameOver {
+      padding-bottom: 48px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="lobby">
-  <div class="lobby-left">
-    <div class="logo"><div style="white-space:nowrap"><span>SPELL</span><span> & KAON!</span></div><small id="tagline">ONE NAME = ONE ROW - TOTAL = EASY+NORMAL+HARD</small></div>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button class="secondary-btn" style="flex:1" onclick="openBook()" id="bookBtn">📚 FRUIT BOOK - 78 ITEMS</button>
-      <button class="secondary-btn" style="flex:0.7" onclick="document.getElementById('leaderList').scrollIntoView({behavior:'smooth'})">🏆 LEADERBOARD</button>
-    </div>
-    <div class="card setup-card">
-      <div class="section-label" id="lblName">Player Name</div>
-      <input id="playerName" class="name-input" placeholder="Enter Name" maxlength="18" autocomplete="off"/>
+  <div id="lobby">
+    <div class="lobby-left">
+      <div class="logo">
+        <div style="white-space:nowrap"><span>SPELL</span><span> & KAON!</span></div><small id="tagline">ONE NAME = ONE
+          ROW - TOTAL = EASY+NORMAL+HARD</small>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="secondary-btn" style="flex:1" onclick="openBook()" id="bookBtn">📚 FRUIT BOOK - 78 ITEMS</button>
+        <button class="secondary-btn" style="flex:0.7"
+          onclick="document.getElementById('leaderList').scrollIntoView({behavior:'smooth'})">🏆 LEADERBOARD</button>
+      </div>
+      <div class="card setup-card">
+        <div class="section-label" id="lblName">Player Name</div>
+        <input id="playerName" class="name-input" placeholder="Enter Name" maxlength="18" autocomplete="off" />
 
-      <div id="playerProgress" class="progress-box">
-        <div class="progress-title"><span id="progTitle">YOUR PROGRESS</span><span id="progName" style="opacity:0.6">-</span></div>
-        <div class="progress-grid">
-          <div class="prog-stat easy"><b id="progEasy">0</b><span>Easy Best</span></div>
-          <div class="prog-stat normal"><b id="progNormal">0</b><span>Normal Best</span></div>
-          <div class="prog-stat hard"><b id="progHard">0</b><span>Hard Best</span></div>
+        <div id="playerProgress" class="progress-box">
+          <div class="progress-title"><span id="progTitle">YOUR PROGRESS</span><span id="progName"
+              style="opacity:0.6">-</span></div>
+          <div class="progress-grid">
+            <div class="prog-stat easy"><b id="progEasy">0</b><span>Easy Best</span></div>
+            <div class="prog-stat normal"><b id="progNormal">0</b><span>Normal Best</span></div>
+            <div class="prog-stat hard"><b id="progHard">0</b><span>Hard Best</span></div>
+          </div>
+          <div class="total-row"><span id="totalLabel">TOTAL (E+N+H)</span><b id="progTotal">0</b></div>
+          <div style="font-size:9px;margin-top:6px;opacity:0.6" id="progHint">Play a level - if you beat your best,
+            total updates!</div>
         </div>
-        <div class="total-row"><span id="totalLabel">TOTAL (E+N+H)</span><b id="progTotal">0</b></div>
-        <div style="font-size:9px;margin-top:6px;opacity:0.6" id="progHint">Play a level - if you beat your best, total updates!</div>
-      </div>
 
-      <div class="section-label" id="lblLang">Game Language (UI only — food stays in English)</div>
-      <div class="lang-grid" id="langGrid"></div>
+        <div class="section-label" id="lblLang">Game Language (UI only — food stays in English)</div>
+        <div class="lang-grid" id="langGrid"></div>
 
-      <div class="section-label" id="lblDevice">What device are you using?</div>
-      <div class="device-grid">
-        <div class="device-card" data-device="pc" onclick="selectDevice('pc')"><span class="ico">💻</span><b id="devPc">PC / Laptop</b><span id="devPcSub">Keyboard + Mouse</span></div>
-        <div class="device-card" data-device="phone" onclick="selectDevice('phone')"><span class="ico">📱</span><b id="devPh">Phone / Tablet</b><span id="devPhSub">Touch Controls</span></div>
-      </div>
+        <div class="section-label" id="lblDevice">What device are you using?</div>
+        <div class="device-grid">
+          <div class="device-card" data-device="pc" onclick="selectDevice('pc')"><span class="ico">💻</span><b
+              id="devPc">PC / Laptop</b><span id="devPcSub">Keyboard + Mouse</span></div>
+          <div class="device-card" data-device="phone" onclick="selectDevice('phone')"><span class="ico">📱</span><b
+              id="devPh">Phone / Tablet</b><span id="devPhSub">Touch Controls</span></div>
+        </div>
 
-      <div class="section-label" id="lblLevel">Choose Difficulty - Points Scale!</div>
-      <div class="level-grid" id="levelGrid">
-        <div class="level-card easy" data-level="easy" onclick="selectLevel('easy')"><span class="lvl-tag" id="tagEasy">EASY</span><span class="lvl-ico">🍎</span><b id="lvlEasyName">Level 1 - Easy</b><p id="lvlEasyDesc">26 common - LOW points: 5 base + 1x time</p><div class="lvl-points">~5-15 pts per fruit</div></div>
-        <div class="level-card normal" data-level="normal" onclick="selectLevel('normal')"><span class="lvl-tag" id="tagNormal">NORMAL</span><span class="lvl-ico">🥑</span><b id="lvlNormalName">Level 2 - Normal</b><p id="lvlNormalDesc">26 uncommon - MEDIUM: 10 base + 2x time</p><div class="lvl-points">~12-30 pts per fruit</div></div>
-        <div class="level-card hard" data-level="hard" onclick="selectLevel('hard')"><span class="lvl-tag" id="tagHard">HARD</span><span class="lvl-ico">🐉</span><b id="lvlHardName">Level 3 - Hard</b><p id="lvlHardDesc">26 rare - HIGH: 20 base + 3.5x time</p><div class="lvl-points">~25-60 pts per fruit</div></div>
-      </div>
+        <div class="section-label" id="lblLevel">Choose Difficulty - Points Scale!</div>
+        <div class="level-grid" id="levelGrid">
+          <div class="level-card easy" data-level="easy" onclick="selectLevel('easy')"><span class="lvl-tag"
+              id="tagEasy">EASY</span><span class="lvl-ico">🍎</span><b id="lvlEasyName">Level 1 - Easy</b>
+            <p id="lvlEasyDesc">26 common - LOW points: 5 base + 1x time</p>
+            <div class="lvl-points">~5-15 pts per fruit</div>
+          </div>
+          <div class="level-card normal" data-level="normal" onclick="selectLevel('normal')"><span class="lvl-tag"
+              id="tagNormal">NORMAL</span><span class="lvl-ico">🥑</span><b id="lvlNormalName">Level 2 - Normal</b>
+            <p id="lvlNormalDesc">26 uncommon - MEDIUM: 10 base + 2x time</p>
+            <div class="lvl-points">~12-30 pts per fruit</div>
+          </div>
+          <div class="level-card hard" data-level="hard" onclick="selectLevel('hard')"><span class="lvl-tag"
+              id="tagHard">HARD</span><span class="lvl-ico">🐉</span><b id="lvlHardName">Level 3 - Hard</b>
+            <p id="lvlHardDesc">26 rare - HIGH: 20 base + 3.5x time</p>
+            <div class="lvl-points">~25-60 pts per fruit</div>
+          </div>
+        </div>
 
-      <button class="play-btn" id="playBtn" disabled onclick="startGameFlow()">▶ PLAY GAME</button>
-      <div class="note-box" id="noteBox">💡 Easy=~5-15 pts/fruit, Normal=~12-30, Hard=~25-60. Same name = same row! Total = Best Easy + Normal + Hard.</div>
-    </div>
-  </div>
-  <div class="lobby-right">
-    <div class="card leader-card">
-      <div class="leader-head"><h3 id="lbTitle">🏆 Leaderboard - TOTAL POINTS</h3><span class="badge" id="lbCount">0 PLAYERS</span></div>
-      <div id="leaderList" class="leader-list"></div>
-      <button onclick="clearLeaderboard()" style="margin-top:8px;width:100%;padding:7px;background:white;border:2px dashed #bbb;border-radius:8px;font-weight:700;font-size:9px;letter-spacing:1px;">CLEAR ALL PROGRESS</button>
-    </div>
-  </div>
-</div>
-
-<!-- BOOK SCREEN -->
-<div id="bookScreen">
-  <div class="book-container card">
-    <div class="book-header">
-      <div>
-        <h2 id="bookTitle">📚 Fruit & Veggie Book</h2>
-        <div class="book-count" id="bookCount">78 items</div>
-      </div>
-      <button onclick="closeBook()" id="bookClose">✕ CLOSE</button>
-    </div>
-    <div class="book-controls">
-      <button class="book-tab active" data-filter="all" onclick="filterBook('all')" id="fAll">ALL 78</button>
-      <button class="book-tab" data-filter="easy" onclick="filterBook('easy')" id="fEasy">EASY 26</button>
-      <button class="book-tab" data-filter="normal" onclick="filterBook('normal')" id="fNormal">NORMAL 26</button>
-      <button class="book-tab" data-filter="hard" onclick="filterBook('hard')" id="fHard">HARD 26</button>
-      <input id="bookSearch" class="book-search" placeholder="Search fruit name..." oninput="renderBook(currentBookFilter, this.value)" />
-    </div>
-    <div id="bookGrid" class="book-grid"></div>
-  </div>
-</div>
-
-<div id="gameScreen">
-  <div class="top-hud">
-    <div class="hud-left-col">
-      <div class="hud-box"><span>❤️</span><div id="hearts" class="hearts">❤️❤️❤️❤️❤️</div></div>
-      <button class="leave-btn" onclick="leaveGame()" id="leaveBtn">🚪 <span id="leaveTxt">LEAVE</span></button>
-    </div>
-    <div class="hud-box"><span>⭐</span><span id="scoreTxt">Score: 0</span></div>
-    <div class="hud-box"><span>🥗</span><span id="eatenTxt">Eaten: 0</span></div>
-    <div class="level-badge-hud" id="levelHud">EASY</div>
-    <div class="progress-wrap"><div class="progress-track"><div id="progressFill" class="progress-fill"></div></div><div class="timer-text" id="timerTxt">10.0s</div></div>
-  </div>
-  <div class="stage">
-    <div class="plate-wrap"><div class="plate"></div>
-      <div id="foodDisplay" class="food-display">
-        <div id="foodEmoji" class="food-emoji">🍎</div>
-        <img id="foodImg" class="food-img" style="display:none" alt="fruit"/>
+        <button class="play-btn" id="playBtn" disabled onclick="startGameFlow()">▶ PLAY GAME</button>
+        <div class="note-box" id="noteBox">💡 Easy=~5-15 pts/fruit, Normal=~12-30, Hard=~25-60. Same name = same row!
+          Total = Best Easy + Normal + Hard.</div>
       </div>
     </div>
-    <div id="wordHint" class="word-hint"></div>
-    <div class="input-area"><input id="spellInput" class="main-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here..."/><div id="feedback" class="feedback"></div></div>
-    <div class="virtual-kb" id="virtualKb"></div>
-    <div class="trash-bin" id="trashBin"><div class="trash-ico">🗑️</div><div class="trash-count" id="trashCount">Trash: 0</div></div>
-  </div>
-</div>
-
-<div id="gameOver">
-  <div class="card over-card">
-    <div class="big-emoji" id="overEmoji">🤤</div>
-    <div class="over-title" id="overTitle">Great Job!</div>
-    <div style="opacity:0.6;font-weight:600;margin-top:4px;font-size:12px" id="overSub">Level finished</div>
-    <div class="stats-grid">
-      <div class="stat"><b id="statScore">0</b><span id="statScoreLbl">This Game</span></div>
-      <div class="stat"><b id="statBestLevel">0</b><span id="statBestLevelLbl">Best This Level</span></div>
-      <div class="stat"><b id="statTrash">0</b><span id="statTrashLbl">Wasted</span></div>
-    </div>
-    <div class="total-display">
-      <span id="totalDesc">TOTAL = EASY BEST + NORMAL BEST + HARD BEST</span>
-      <b id="statTotal">0</b>
-      <div style="font-size:11px;margin-top:6px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-        <span>E: <b id="totalEasy">0</b></span>
-        <span>N: <b id="totalNormal">0</b></span>
-        <span>H: <b id="totalHard">0</b></span>
+    <div class="lobby-right">
+      <div class="card leader-card">
+        <div class="leader-head">
+          <h3 id="lbTitle">🏆 Leaderboard - TOTAL POINTS</h3><span class="badge" id="lbCount">0 PLAYERS</span>
+        </div>
+        <div id="leaderList" class="leader-list"></div>
+        <button onclick="clearLeaderboard()"
+          style="margin-top:8px;width:100%;padding:7px;background:white;border:2px dashed #bbb;border-radius:8px;font-weight:700;font-size:9px;letter-spacing:1px;">CLEAR
+          ALL PROGRESS</button>
       </div>
-      <div style="font-size:9px;margin-top:6px;opacity:0.8" id="totalHint">Beat all 3 levels to maximize!</div>
     </div>
-    <button class="play-btn" onclick="backToLobby()" id="btnBackLobby">BACK TO LOBBY</button>
-    <button class="secondary-btn" onclick="openBook()" style="margin-top:8px">📚 Open Fruit Book</button>
-    <div style="margin-top:10px;text-align:left"><div class="section-label" id="lbTitle2">Leaderboard - Total Points</div><div id="finalLeaderList" style="max-height:180px;overflow:auto"></div></div>
   </div>
-</div>
 
-<script>
-const LEVEL_FOODS = {
-  easy: [
-    {name:"apple", emoji:"🍎"}, {name:"banana", emoji:"🍌"}, {name:"orange", emoji:"🍊"}, {name:"grape", emoji:"🍇"},
-    {name:"strawberry", emoji:"🍓"}, {name:"watermelon", emoji:"🍉"}, {name:"lemon", emoji:"🍋"}, {name:"lime", emoji:"🍈"},
-    {name:"pear", emoji:"🍐"}, {name:"peach", emoji:"🍑"}, {name:"cherry", emoji:"🍒"}, {name:"mango", emoji:"🥭"},
-    {name:"pineapple", emoji:"🍍"}, {name:"tomato", emoji:"🍅"}, {name:"carrot", emoji:"🥕"}, {name:"potato", emoji:"🥔"},
-    {name:"corn", emoji:"🌽"}, {name:"pumpkin", emoji:"🎃"}, {name:"cucumber", emoji:"🥒", img:"cucumber.jpg"}, {name:"lettuce", emoji:"🥬"},
-    {name:"coconut", emoji:"🥥"}, {name:"kiwi", emoji:"🥝"}, {name:"peanut", emoji:"🥜"}, {name:"pepper", emoji:"🌶️"},
-    {name:"onion", emoji:"🧅", img:"onion.png"}, {name:"sweetpotato", emoji:"🍠", img:"sweetpotato.jpg", display:"sweet potato"},
-  ],
-  normal: [
-    {name:"broccoli", emoji:"🥦"},
-    {name:"eggplant", emoji:"🍆"},
-    {name:"avocado", emoji:"🥑"},
-    {name:"garlic", emoji:"🧄", img:"garlic.jpg"},
-    {name:"mushroom", emoji:"🍄"},
-    {name:"bellpepper", emoji:"🫑", img:"bellpepper.jpg", display:"bell pepper"},
-    {name:"chili", emoji:"🌶️"},
-    {name:"blueberry", emoji:"🫐", img:"blueberry.jpg"},
-    {name:"olive", emoji:"🫒", img:"olive2.jpg"},
-    {name:"cauliflower", emoji:"🥦", img:"cauliflower.png"},
-    {name:"cabbage", emoji:"🥬"},
-    {name:"kale", emoji:"🥬", img:"kale.png"},
-    {name:"spinach", emoji:"🌿", img:"spinach.jpg"},
-    {name:"zucchini", emoji:"🥒", img:"zucchini.png"},
-    {name:"celery", emoji:"🥬", img:"celery.jpg"},
-    {name:"leek", emoji:"🧅", img:"onion.png"},
-    {name:"papaya", emoji:"🍈"},
-    {name:"fig", emoji:"🍇", img:"fig.jpg"},
-    {name:"blackberry", emoji:"🍇", img:"blackberry.jpg"},
-    {name:"raspberry", emoji:"🍓"},
-    {name:"apricot", emoji:"🍑"},
-    {name:"plum", emoji:"🍇", img:"plum.jpg"},
-    {name:"ginger", emoji:"🫚", img:"ginger.jpg"},
-    {name:"coconut", emoji:"🥥"},
-    {name:"sweetpotato", emoji:"🍠", img:"sweetpotato.jpg", display:"sweet potato"},
-    {name:"greenbean", emoji:"🌿", img:"greenbean.jpg", display:"green bean"},
-  ],
-  hard: [
-    {name:"durian", emoji:"🍈", img:"durian.png"}, {name:"dragonfruit", emoji:"🍈", img:"dragonfruit.png"},
-    {name:"lychee", emoji:"🍒", img:"lychee.png"}, {name:"rambutan", emoji:"🍓", img:"rambutan.png"},
-    {name:"jackfruit", emoji:"🍈", img:"jackfruit.png"}, {name:"starfruit", emoji:"⭐", img:"starfruit.png"},
-    {name:"artichoke", emoji:"🌿", img:"artichoke.png"}, {name:"asparagus", emoji:"🌿", img:"asparagus.png"},
-    {name:"beetroot", emoji:"🍠", img:"beetroot.png"}, {name:"radish", emoji:"🥕", img:"radish.jpg"},
-    {name:"okra", emoji:"🌿", img:"okra.jpg"}, {name:"pomegranate", emoji:"🍎", img:"pomegranate.jpg"},
-    {name:"cauliflower", emoji:"🥦", img:"cauliflower.png"}, {name:"kale", emoji:"🥬", img:"kale.png"},
-    {name:"mangosteen", emoji:"🍇", img:"mangosteen.jpg"}, {name:"soursop", emoji:"🍈", img:"soursop.jpg"},
-    {name:"persimmon", emoji:"🍑", img:"persimmon.jpg"}, {name:"quince", emoji:"🍐", img:"quince.jpg"},
-    {name:"kohlrabi", emoji:"🥬", img:"kohlrabi.jpg"}, {name:"parsnip", emoji:"🥕", img:"parsnip.jpg"},
-    {name:"turnip", emoji:"🥔", img:"turnip.jpg"}, {name:"edamame", emoji:"🌿", img:"edamame.png"},
-    {name:"chard", emoji:"🥬", img:"chard.jpg"}, {name:"guava", emoji:"🍐", img:"guava.jpg"},
-    {name:"tamarind", emoji:"🥜", img:"tamarind.jpg"}, {name:"longan", emoji:"🍇", img:"longan.jpg"},
-  ]
-};
-const SCORING={easy:{base:5,timeMul:1.0,streakMul:1.0},normal:{base:10,timeMul:2.0,streakMul:2.0},hard:{base:20,timeMul:3.5,streakMul:3.5}};
+  <!-- BOOK SCREEN -->
+  <div id="bookScreen">
+    <div class="book-container card">
+      <div class="book-header">
+        <div>
+          <h2 id="bookTitle">📚 Fruit & Veggie Book</h2>
+          <div class="book-count" id="bookCount">78 items</div>
+        </div>
+        <button onclick="closeBook()" id="bookClose">✕ CLOSE</button>
+      </div>
+      <div class="book-controls">
+        <button class="book-tab active" data-filter="all" onclick="filterBook('all')" id="fAll">ALL 78</button>
+        <button class="book-tab" data-filter="easy" onclick="filterBook('easy')" id="fEasy">EASY 26</button>
+        <button class="book-tab" data-filter="normal" onclick="filterBook('normal')" id="fNormal">NORMAL 26</button>
+        <button class="book-tab" data-filter="hard" onclick="filterBook('hard')" id="fHard">HARD 26</button>
+        <input id="bookSearch" class="book-search" placeholder="Search fruit name..."
+          oninput="renderBook(currentBookFilter, this.value)" />
+      </div>
+      <div id="bookGrid" class="book-grid"></div>
+    </div>
+  </div>
 
-const TRANSLATIONS={
-  en:{
-    tagline:"ONE NAME = ONE ROW - TOTAL = EASY+NORMAL+HARD",
-    playerName:"Player Name", langLabel:"Game Language (UI only — food stays in English)", deviceLabel:"What device are you using?", levelLabel:"Choose Difficulty - Points Scale!",
-    easyName:"Level 1 - Easy", easyDesc:"26 common - LOW points: 5 base + 1x", normalName:"Level 2 - Normal", normalDesc:"26 uncommon - MED: 10 base + 2x", hardName:"Level 3 - Hard", hardDesc:"26 rare - HIGH: 20 base + 3.5x",
-    pc:"PC / Laptop", pcSub:"Keyboard + Mouse", phone:"Phone / Tablet", phoneSub:"Touch", play:"▶ PLAY GAME", bookBtn:"📚 FRUIT BOOK - 78 ITEMS",
-    how:"💡 Easy=~5-15 pts, Normal=~12-30, Hard=~25-60. Same name = same row! Total = Best Easy + Normal + Hard.",
-    lbTitle:"🏆 Leaderboard - TOTAL", lbCount:"{n} PLAYERS", inputPlaceholder:"type here...", eaten:"Eaten: {n}", score:"Score: {n}", trash:"Trash: {n}",
-    leave:"LEAVE", easyTag:"EASY", normalTag:"NORMAL", hardTag:"HARD",
-    great:"Great Job!", overSub:"Level finished", scoreLbl:"This Game", bestLevelLbl:"Best This Level", trashLbl:"Wasted", levelLbl:"Level", backLobby:"BACK TO LOBBY",
-    progTitle:"YOUR PROGRESS", totalLabel:"TOTAL (E+N+H)", progHint:"Play a level - if you beat your best, total updates!",
-    totalDesc:"TOTAL = EASY BEST + NORMAL BEST + HARD BEST", totalHint:"Beat all 3 levels to maximize!",
-    bookTitle:"📚 Fruit & Veggie Book", bookClose:"✕ CLOSE", fAll:"ALL", fEasy:"EASY 26", fNormal:"NORMAL 26", fHard:"HARD 26", bookSearch:"Search fruit name...", bookCount:"{n} items",
-    feedbackGood:["Yummy!","Delicious!","Tasty!"], feedbackBad:["Oops!","Try again!"], timeUp:"Time's up!"
-  },
-  es:{tagline:"UN NOMBRE = UNA FILA", playerName:"Nombre", langLabel:"Idioma", deviceLabel:"Dispositivo", levelLabel:"Nivel - Puntos", easyName:"Nivel 1 - Fácil", easyDesc:"26 comunes", normalName:"Nivel 2 - Normal", normalDesc:"26 medios", hardName:"Nivel 3 - Difícil", hardDesc:"26 raras", pc:"PC", pcSub:"Teclado", phone:"Tel", phoneSub:"Táctil", play:"▶ JUGAR", bookBtn:"📚 LIBRO DE FRUTAS - 78", how:"💡 Fácil=pocos, Normal=medio, Difícil=mucho", lbTitle:"🏆 Tabla - TOTAL", lbCount:"{n}", inputPlaceholder:"escribe...", eaten:"Comidas: {n}", score:"Puntos: {n}", trash:"Basura: {n}", leave:"SALIR", easyTag:"FÁCIL", normalTag:"NORMAL", hardTag:"DIFÍCIL", great:"¡Buen!", overSub:"Nivel", scoreLbl:"Juego", bestLevelLbl:"Mejor Nivel", trashLbl:"Desperd", levelLbl:"Nivel", backLobby:"VOLVER", progTitle:"TU PROGRESO", totalLabel:"TOTAL", progHint:"Juega!", totalDesc:"TOTAL = MEJOR F+N+D", totalHint:"¡Supera 3 niveles!", bookTitle:"📚 Libro de Frutas", bookClose:"✕ CERRAR", fAll:"TODOS", fEasy:"FÁCIL", fNormal:"NORMAL", fHard:"DIFÍCIL", bookSearch:"Buscar...", bookCount:"{n} items", feedbackGood:["¡Rico!"], feedbackBad:["¡Uy!"], timeUp:"¡Tiempo!"},
-  fil:{tagline:"ISANG PANGALAN = ISANG ROW", playerName:"Pangalan", langLabel:"Wika", deviceLabel:"Device", levelLabel:"Level", easyName:"Level 1 - Easy", easyDesc:"26 common", normalName:"Level 2 - Normal", normalDesc:"26 uncommon", hardName:"Level 3 - Hard", hardDesc:"26 rare", pc:"PC", pcSub:"Keyboard", phone:"Phone", phoneSub:"Pindot", play:"▶ LARO", bookBtn:"📚 BOOK NG PRUTAS - 78", how:"💡 Easy=konti, Normal=medyo, Hard=malaki", lbTitle:"🏆 Board - TOTAL", lbCount:"{n}", inputPlaceholder:"type...", eaten:"Nakain: {n}", score:"Score: {n}", trash:"Basura: {n}", leave:"UMALIS", easyTag:"EASY", normalTag:"NORMAL", hardTag:"HARD", great:"Galing!", overSub:"Tapos level", scoreLbl:"Laro", bestLevelLbl:"Best Level", trashLbl:"Sayang", levelLbl:"Level", backLobby:"BALIK", progTitle:"PROGRESS MO", totalLabel:"TOTAL", progHint:"Maglaro!", totalDesc:"TOTAL = BEST E+N+H", totalHint:"Tapusin 3 levels!", bookTitle:"📚 Book ng Prutas", bookClose:"✕ ISARA", fAll:"LAHAT", fEasy:"EASY", fNormal:"NORMAL", fHard:"HARD", bookSearch:"Hanapin...", bookCount:"{n} items", feedbackGood:["Sarap!"], feedbackBad:["Oops!"], timeUp:"Time's up!"},
-  ja:{tagline:"1名1行 - 合計 = 簡+普+難", playerName:"名前", langLabel:"言語", deviceLabel:"デバイス", levelLabel:"レベル", easyName:"レベル1 簡単", easyDesc:"26個 低得点", normalName:"レベル2 普通", normalDesc:"26個 中", hardName:"レベル3 難", hardDesc:"26レア 高得点", pc:"PC", pcSub:"キー", phone:"スマホ", phoneSub:"タッチ", play:"▶ プレイ", bookBtn:"📚 図鑑 - 78個", how:"💡 簡単=低、中=中、難=高", lbTitle:"🏆 合計ランキング", lbCount:"{n}", inputPlaceholder:"入力...", eaten:"食べた: {n}", score:"スコア: {n}", trash:"ゴミ: {n}", leave:"出る", easyTag:"簡単", normalTag:"普通", hardTag:"難", great:"よくできた！", overSub:"レベル完了", scoreLbl:"今回", bestLevelLbl:"最高", trashLbl:"廃棄", levelLbl:"レベル", backLobby:"ロビー", progTitle:"あなたの進捗", totalLabel:"合計", progHint:"ベスト超えで更新!", totalDesc:"合計 = 最高 簡+普+難", totalHint:"3レベル制覇で最大!", bookTitle:"📚 果物図鑑", bookClose:"✕ 閉じる", fAll:"すべて", fEasy:"簡単", fNormal:"普通", fHard:"難", bookSearch:"検索...", bookCount:"{n} 個", feedbackGood:["おいしい！"], feedbackBad:["おっと！"], timeUp:"時間切れ！"}
-};
+  <div id="gameScreen">
+    <div class="top-hud">
+      <div class="hud-left-col">
+        <div class="hud-box"><span>❤️</span>
+          <div id="hearts" class="hearts">❤️❤️❤️❤️❤️</div>
+        </div>
+        <button class="leave-btn" onclick="leaveGame()" id="leaveBtn">🚪 <span id="leaveTxt">LEAVE</span></button>
+      </div>
+      <div class="hud-box"><span>⭐</span><span id="scoreTxt">Score: 0</span></div>
+      <div class="hud-box"><span>🥗</span><span id="eatenTxt">Eaten: 0</span></div>
+      <div class="level-badge-hud" id="levelHud">EASY</div>
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div class="timer-text" id="timerTxt">10.0s</div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="plate-wrap">
+        <div class="plate"></div>
+        <div id="foodDisplay" class="food-display">
+          <div id="foodEmoji" class="food-emoji">🍎</div>
+          <img id="foodImg" class="food-img" style="display:none" alt="fruit" />
+        </div>
+      </div>
+      <div id="wordHint" class="word-hint"></div>
+      <div class="input-area"><input id="spellInput" class="main-input" autocomplete="off" autocorrect="off"
+          autocapitalize="off" spellcheck="false" placeholder="type here..." />
+        <div id="feedback" class="feedback"></div>
+      </div>
+      <div class="virtual-kb" id="virtualKb"></div>
+      <div class="trash-bin" id="trashBin">
+        <div class="trash-ico">🗑️</div>
+        <div class="trash-count" id="trashCount">Trash: 0</div>
+      </div>
+    </div>
+  </div>
 
-const LANG_OPTIONS=[{id:"en",flag:"🇺🇸",label:"English"},{id:"es",flag:"🇪🇸",label:"Español"},{id:"fil",flag:"🇵🇭",label:"Filipino"},{id:"ja",flag:"🇯🇵",label:"日本語"}];
-let currentLang="en", currentDevice=null, currentLevel=null, currentBookFilter='all';
-let gameState={health:5,score:0,eaten:0,trash:0,streak:0,bestStreak:0,correct:0,wrongAttempts:0,currentFood:null,timeLeft:0,timeMax:10,timerInterval:null,gameActive:false,history:[],usedThisGame:new Set()};
+  <div id="gameOver">
+    <div class="card over-card">
+      <div class="big-emoji" id="overEmoji">🤤</div>
+      <div class="over-title" id="overTitle">Great Job!</div>
+      <div style="opacity:0.6;font-weight:600;margin-top:4px;font-size:12px" id="overSub">Level finished</div>
+      <div class="stats-grid">
+        <div class="stat"><b id="statScore">0</b><span id="statScoreLbl">This Game</span></div>
+        <div class="stat"><b id="statBestLevel">0</b><span id="statBestLevelLbl">Best This Level</span></div>
+        <div class="stat"><b id="statTrash">0</b><span id="statTrashLbl">Wasted</span></div>
+      </div>
+      <div class="total-display">
+        <span id="totalDesc">TOTAL = EASY BEST + NORMAL BEST + HARD BEST</span>
+        <b id="statTotal">0</b>
+        <div style="font-size:11px;margin-top:6px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <span>E: <b id="totalEasy">0</b></span>
+          <span>N: <b id="totalNormal">0</b></span>
+          <span>H: <b id="totalHard">0</b></span>
+        </div>
+        <div style="font-size:9px;margin-top:6px;opacity:0.8" id="totalHint">Beat all 3 levels to maximize!</div>
+      </div>
+      <button class="play-btn" onclick="backToLobby()" id="btnBackLobby">BACK TO LOBBY</button>
+      <button class="secondary-btn" onclick="openBook()" style="margin-top:8px">📚 Open Fruit Book</button>
+      <div style="margin-top:10px;text-align:left">
+        <div class="section-label" id="lbTitle2">Leaderboard - Total Points</div>
+        <div id="finalLeaderList" style="max-height:180px;overflow:auto"></div>
+      </div>
+    </div>
+  </div>
 
-const langGrid=document.getElementById("langGrid");
-LANG_OPTIONS.forEach(opt=>{const btn=document.createElement("button");btn.className="lang-btn";btn.dataset.lang=opt.id;btn.innerHTML=`<span class="flag">${opt.flag}</span>${opt.label}`;btn.onclick=()=>selectLang(opt.id);langGrid.appendChild(btn);});
+  <script>
+    const LEVEL_FOODS = {
+      easy: [
+        { name: "apple", emoji: "🍎" }, { name: "banana", emoji: "🍌" }, { name: "orange", emoji: "🍊" }, { name: "grape", emoji: "🍇" },
+        { name: "strawberry", emoji: "🍓" }, { name: "watermelon", emoji: "🍉" }, { name: "lemon", emoji: "🍋" }, { name: "lime", emoji: "🍈" },
+        { name: "pear", emoji: "🍐" }, { name: "peach", emoji: "🍑" }, { name: "cherry", emoji: "🍒" }, { name: "mango", emoji: "🥭" },
+        { name: "pineapple", emoji: "🍍" }, { name: "tomato", emoji: "🍅" }, { name: "carrot", emoji: "🥕" }, { name: "potato", emoji: "🥔" },
+        { name: "corn", emoji: "🌽" }, { name: "pumpkin", emoji: "🎃" }, { name: "cucumber", emoji: "🥒", img: "cucumber.jpg" }, { name: "lettuce", emoji: "🥬" },
+        { name: "coconut", emoji: "🥥" }, { name: "kiwi", emoji: "🥝" }, { name: "peanut", emoji: "🥜" }, { name: "pepper", emoji: "🌶️" },
+        { name: "onion", emoji: "🧅", img: "onion.png" }, { name: "sweetpotato", emoji: "🍠", img: "sweetpotato.jpg", display: "sweet potato" },
+      ],
+      normal: [
+        { name: "broccoli", emoji: "🥦" },
+        { name: "eggplant", emoji: "🍆" },
+        { name: "avocado", emoji: "🥑" },
+        { name: "garlic", emoji: "🧄", img: "pho/garlic.jpg" },
+        { name: "mushroom", emoji: "🍄" },
+        { name: "bellpepper", emoji: "🫑", img: "pho/bellpepper.jpg", display: "bell pepper" },
+        { name: "chili", emoji: "🌶️" },
+        { name: "blueberry", emoji: "🫐", img: "pho/blueberry.jpg" },
+        { name: "olive", emoji: "🫒", img: "pho/olive2.jpg" },
+        { name: "cauliflower", emoji: "🥦", img: "pho/cauliflower.png" },
+        { name: "cabbage", emoji: "🥬" },
+        { name: "kale", emoji: "🥬", img: "pho/kale.png" },
+        { name: "spinach", emoji: "🌿", img: "pho/spinach.jpg" },
+        { name: "zucchini", emoji: "🥒", img: "pho/zucchini.png" },
+        { name: "celery", emoji: "🥬", img: "pho/celery.jpg" },
+        { name: "leek", emoji: "🧅", img: "pho/onion.png" },
+        { name: "papaya", emoji: "🍈" },
+        { name: "fig", emoji: "🍇", img: "pho/fig.jpg" },
+        { name: "blackberry", emoji: "🍇", img: "pho/blackberry.jpg" },
+        { name: "raspberry", emoji: "🍓" },
+        { name: "apricot", emoji: "🍑" },
+        { name: "plum", emoji: "🍇", img: "pho/plum.jpg" },
+        { name: "ginger", emoji: "🫚", img: "pho/ginger.jpg" },
+        { name: "coconut", emoji: "🥥" },
+        { name: "sweetpotato", emoji: "🍠", img: "pho/sweetpotato.jpg", display: "sweet potato" },
+        { name: "greenbean", emoji: "🌿", img: "pho/green-bean.jpg", display: "green bean" },
+      ],
+      hard: [
+        { name: "durian", emoji: "🍈", img: "pho/durian.png" }, { name: "dragonfruit", emoji: "🍈", img: "pho/dragonfruit.png" },
+        { name: "lychee", emoji: "🍒", img: "pho/lychee.png" }, { name: "rambutan", emoji: "🍓", img: "pho/rambutan.png" },
+        { name: "jackfruit", emoji: "🍈", img: "pho/jackfruit.png" }, { name: "starfruit", emoji: "⭐", img: "pho/starfruit.png" },
+        { name: "artichoke", emoji: "🌿", img: "pho/artichoke.png" }, { name: "asparagus", emoji: "🌿", img: "pho/asparagus.png" },
+        { name: "beetroot", emoji: "🍠", img: "pho/beetroot.png" }, { name: "radish", emoji: "🥕", img: "pho/radish.jpg" },
+        { name: "okra", emoji: "🌿", img: "pho/okra.jpg" }, { name: "pomegranate", emoji: "🍎", img: "pho/pomegranate.jpg" },
+        { name: "cauliflower", emoji: "🥦", img: "pho/cauliflower.png" }, { name: "kale", emoji: "🥬", img: "pho/kale.png" },
+        { name: "mangosteen", emoji: "🍇", img: "pho/mangosteen.jpg" }, { name: "soursop", emoji: "🍈", img: "pho/soursop.jpg" },
+        { name: "persimmon", emoji: "🍑", img: "pho/persimmon.jpg" }, { name: "quince", emoji: "🍐", img: "pho/quince.png" },
+        { name: "kohlrabi", emoji: "🥬", img: "pho/kohlrabi.jpg" }, { name: "parsnip", emoji: "🥕", img: "pho/parsnip.jpg" },
+        { name: "turnip", emoji: "🥔", img: "pho/turnip.jpg" }, { name: "edamame", emoji: "🌿", img: "pho/edamame.png" },
+        { name: "chard", emoji: "🥬", img: "pho/chard.jpg" }, { name: "guava", emoji: "🍐", img: "pho/guava.jpg" },
+        { name: "tamarind", emoji: "🥜", img: "pho/tamarind.jpg" }, { name: "longan", emoji: "🍇", img: "pho/longan.jpg" },
+      ]
+    };
+    const SCORING = { easy: { base: 5, timeMul: 1.0, streakMul: 1.0 }, normal: { base: 10, timeMul: 2.0, streakMul: 2.0 }, hard: { base: 20, timeMul: 3.5, streakMul: 3.5 } };
 
-function selectLang(lang){currentLang=lang;document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active", b.dataset.lang===lang));applyTranslations();validateForm();}
-function selectDevice(dev){currentDevice=dev;document.querySelectorAll(".device-card").forEach(c=>c.classList.toggle("active", c.dataset.device===dev));validateForm();}
-function selectLevel(lvl){currentLevel=lvl;document.querySelectorAll(".level-card").forEach(c=>c.classList.toggle("active", c.dataset.level===lvl));validateForm();}
-function applyTranslations(){
-  const t=TRANSLATIONS[currentLang];
-  document.getElementById("tagline").innerText=t.tagline;
-  document.getElementById("lblName").innerText=t.playerName;
-  document.getElementById("lblLang").innerText=t.langLabel;
-  document.getElementById("lblDevice").innerText=t.deviceLabel;
-  document.getElementById("lblLevel").innerText=t.levelLabel;
-  document.getElementById("devPc").innerText=t.pc;document.getElementById("devPcSub").innerText=t.pcSub;
-  document.getElementById("devPh").innerText=t.phone;document.getElementById("devPhSub").innerText=t.phoneSub;
-  document.getElementById("lvlEasyName").innerText=t.easyName;document.getElementById("lvlEasyDesc").innerText=t.easyDesc;
-  document.getElementById("lvlNormalName").innerText=t.normalName;document.getElementById("lvlNormalDesc").innerText=t.normalDesc;
-  document.getElementById("lvlHardName").innerText=t.hardName;document.getElementById("lvlHardDesc").innerText=t.hardDesc;
-  document.getElementById("tagEasy").innerText=t.easyTag;document.getElementById("tagNormal").innerText=t.normalTag;document.getElementById("tagHard").innerText=t.hardTag;
-  document.getElementById("playBtn").innerText=t.play;
-  document.getElementById("bookBtn").innerText=t.bookBtn;
-  document.getElementById("noteBox").innerHTML=t.how;
-  document.getElementById("lbTitle").innerText=t.lbTitle;
-  document.getElementById("lbTitle2").innerText=t.lbTitle;
-  document.getElementById("overTitle").innerText=t.great;
-  document.getElementById("overSub").innerText=t.overSub;
-  document.getElementById("statScoreLbl").innerText=t.scoreLbl;
-  document.getElementById("statBestLevelLbl").innerText=t.bestLevelLbl;
-  document.getElementById("statTrashLbl").innerText=t.trashLbl;
-  document.getElementById("statLevelLbl").innerText=t.levelLbl;
-  document.getElementById("btnBackLobby").innerText=t.backLobby;
-  document.getElementById("leaveTxt").innerText=t.leave;
-  document.getElementById("spellInput").placeholder=t.inputPlaceholder;
-  document.getElementById("progTitle").innerText=t.progTitle;
-  document.getElementById("totalLabel").innerText=t.totalLabel;
-  document.getElementById("progHint").innerText=t.progHint;
-  document.getElementById("totalDesc").innerText=t.totalDesc;
-  document.getElementById("totalHint").innerText=t.totalHint;
-  document.getElementById("bookTitle").innerText=t.bookTitle;
-  document.getElementById("bookClose").innerText=t.bookClose;
-  document.getElementById("fAll").innerText=t.fAll;
-  document.getElementById("fEasy").innerText=t.fEasy;
-  document.getElementById("fNormal").innerText=t.fNormal;
-  document.getElementById("fHard").innerText=t.fHard;
-  document.getElementById("bookSearch").placeholder=t.bookSearch;
-  if(gameState.gameActive) updateHUD();
-  updateLeaderboardUI();
-  updatePlayerProgressBox();
-  if(document.getElementById("bookScreen").style.display==='flex') renderBook(currentBookFilter, document.getElementById("bookSearch").value);
-}
-document.getElementById("playerName").addEventListener("input",()=>{validateForm();updatePlayerProgressBox();});
-function validateForm(){const name=document.getElementById("playerName").value.trim();const btn=document.getElementById("playBtn");btn.disabled=!(name.length>=2 && currentLang && currentDevice && currentLevel);}
+    const TRANSLATIONS = {
+      en: {
+        tagline: "ONE NAME = ONE ROW - TOTAL = EASY+NORMAL+HARD",
+        playerName: "Player Name", langLabel: "Game Language (UI only — food stays in English)", deviceLabel: "What device are you using?", levelLabel: "Choose Difficulty - Points Scale!",
+        easyName: "Level 1 - Easy", easyDesc: "26 common - LOW points: 5 base + 1x", normalName: "Level 2 - Normal", normalDesc: "26 uncommon - MED: 10 base + 2x", hardName: "Level 3 - Hard", hardDesc: "26 rare - HIGH: 20 base + 3.5x",
+        pc: "PC / Laptop", pcSub: "Keyboard + Mouse", phone: "Phone / Tablet", phoneSub: "Touch", play: "▶ PLAY GAME", bookBtn: "📚 FRUIT BOOK - 78 ITEMS",
+        how: "💡 Easy=~5-15 pts, Normal=~12-30, Hard=~25-60. Same name = same row! Total = Best Easy + Normal + Hard.",
+        lbTitle: "🏆 Leaderboard - TOTAL", lbCount: "{n} PLAYERS", inputPlaceholder: "type here...", eaten: "Eaten: {n}", score: "Score: {n}", trash: "Trash: {n}",
+        leave: "LEAVE", easyTag: "EASY", normalTag: "NORMAL", hardTag: "HARD",
+        great: "Great Job!", overSub: "Level finished", scoreLbl: "This Game", bestLevelLbl: "Best This Level", trashLbl: "Wasted", levelLbl: "Level", backLobby: "BACK TO LOBBY",
+        progTitle: "YOUR PROGRESS", totalLabel: "TOTAL (E+N+H)", progHint: "Play a level - if you beat your best, total updates!",
+        totalDesc: "TOTAL = EASY BEST + NORMAL BEST + HARD BEST", totalHint: "Beat all 3 levels to maximize!",
+        bookTitle: "📚 Fruit & Veggie Book", bookClose: "✕ CLOSE", fAll: "ALL", fEasy: "EASY 26", fNormal: "NORMAL 26", fHard: "HARD 26", bookSearch: "Search fruit name...", bookCount: "{n} items",
+        feedbackGood: ["Yummy!", "Delicious!", "Tasty!"], feedbackBad: ["Oops!", "Try again!"], timeUp: "Time's up!"
+      },
+      es: { tagline: "UN NOMBRE = UNA FILA", playerName: "Nombre", langLabel: "Idioma", deviceLabel: "Dispositivo", levelLabel: "Nivel - Puntos", easyName: "Nivel 1 - Fácil", easyDesc: "26 comunes", normalName: "Nivel 2 - Normal", normalDesc: "26 medios", hardName: "Nivel 3 - Difícil", hardDesc: "26 raras", pc: "PC", pcSub: "Teclado", phone: "Tel", phoneSub: "Táctil", play: "▶ JUGAR", bookBtn: "📚 LIBRO DE FRUTAS - 78", how: "💡 Fácil=pocos, Normal=medio, Difícil=mucho", lbTitle: "🏆 Tabla - TOTAL", lbCount: "{n}", inputPlaceholder: "escribe...", eaten: "Comidas: {n}", score: "Puntos: {n}", trash: "Basura: {n}", leave: "SALIR", easyTag: "FÁCIL", normalTag: "NORMAL", hardTag: "DIFÍCIL", great: "¡Buen!", overSub: "Nivel", scoreLbl: "Juego", bestLevelLbl: "Mejor Nivel", trashLbl: "Desperd", levelLbl: "Nivel", backLobby: "VOLVER", progTitle: "TU PROGRESO", totalLabel: "TOTAL", progHint: "Juega!", totalDesc: "TOTAL = MEJOR F+N+D", totalHint: "¡Supera 3 niveles!", bookTitle: "📚 Libro de Frutas", bookClose: "✕ CERRAR", fAll: "TODOS", fEasy: "FÁCIL", fNormal: "NORMAL", fHard: "DIFÍCIL", bookSearch: "Buscar...", bookCount: "{n} items", feedbackGood: ["¡Rico!"], feedbackBad: ["¡Uy!"], timeUp: "¡Tiempo!" },
+      fil: { tagline: "ISANG PANGALAN = ISANG ROW", playerName: "Pangalan", langLabel: "Wika", deviceLabel: "Device", levelLabel: "Level", easyName: "Level 1 - Easy", easyDesc: "26 common", normalName: "Level 2 - Normal", normalDesc: "26 uncommon", hardName: "Level 3 - Hard", hardDesc: "26 rare", pc: "PC", pcSub: "Keyboard", phone: "Phone", phoneSub: "Pindot", play: "▶ LARO", bookBtn: "📚 BOOK NG PRUTAS - 78", how: "💡 Easy=konti, Normal=medyo, Hard=malaki", lbTitle: "🏆 Board - TOTAL", lbCount: "{n}", inputPlaceholder: "type...", eaten: "Nakain: {n}", score: "Score: {n}", trash: "Basura: {n}", leave: "UMALIS", easyTag: "EASY", normalTag: "NORMAL", hardTag: "HARD", great: "Galing!", overSub: "Tapos level", scoreLbl: "Laro", bestLevelLbl: "Best Level", trashLbl: "Sayang", levelLbl: "Level", backLobby: "BALIK", progTitle: "PROGRESS MO", totalLabel: "TOTAL", progHint: "Maglaro!", totalDesc: "TOTAL = BEST E+N+H", totalHint: "Tapusin 3 levels!", bookTitle: "📚 Book ng Prutas", bookClose: "✕ ISARA", fAll: "LAHAT", fEasy: "EASY", fNormal: "NORMAL", fHard: "HARD", bookSearch: "Hanapin...", bookCount: "{n} items", feedbackGood: ["Sarap!"], feedbackBad: ["Oops!"], timeUp: "Time's up!" },
+      ja: { tagline: "1名1行 - 合計 = 簡+普+難", playerName: "名前", langLabel: "言語", deviceLabel: "デバイス", levelLabel: "レベル", easyName: "レベル1 簡単", easyDesc: "26個 低得点", normalName: "レベル2 普通", normalDesc: "26個 中", hardName: "レベル3 難", hardDesc: "26レア 高得点", pc: "PC", pcSub: "キー", phone: "スマホ", phoneSub: "タッチ", play: "▶ プレイ", bookBtn: "📚 図鑑 - 78個", how: "💡 簡単=低、中=中、難=高", lbTitle: "🏆 合計ランキング", lbCount: "{n}", inputPlaceholder: "入力...", eaten: "食べた: {n}", score: "スコア: {n}", trash: "ゴミ: {n}", leave: "出る", easyTag: "簡単", normalTag: "普通", hardTag: "難", great: "よくできた！", overSub: "レベル完了", scoreLbl: "今回", bestLevelLbl: "最高", trashLbl: "廃棄", levelLbl: "レベル", backLobby: "ロビー", progTitle: "あなたの進捗", totalLabel: "合計", progHint: "ベスト超えで更新!", totalDesc: "合計 = 最高 簡+普+難", totalHint: "3レベル制覇で最大!", bookTitle: "📚 果物図鑑", bookClose: "✕ 閉じる", fAll: "すべて", fEasy: "簡単", fNormal: "普通", fHard: "難", bookSearch: "検索...", bookCount: "{n} 個", feedbackGood: ["おいしい！"], feedbackBad: ["おっと！"], timeUp: "時間切れ！" }
+    };
 
-function getRawLeaderboard(){try{return JSON.parse(localStorage.getItem("spellEatLeaderboard")||"[]");}catch{return[];}}
-function migrateLeaderboardIfNeeded(){
-  let raw=getRawLeaderboard();
-  if(raw.length===0) return [];
-  const map=new Map();
-  raw.forEach(entry=>{
-    if(!entry.name) return;
-    const key=entry.name.trim().toLowerCase(); if(!key) return;
-    if(!map.has(key)){
-      map.set(key,{name:entry.name.trim(),bestEasy:0,bestNormal:0,bestHard:0,total:0,plays:0,eaten:0,trash:0,device:entry.device||'pc',lang:entry.lang||'en',date:entry.date||new Date().toISOString()});
+    const LANG_OPTIONS = [{ id: "en", flag: "🇺🇸", label: "English" }, { id: "es", flag: "🇪🇸", label: "Español" }, { id: "fil", flag: "🇵🇭", label: "Filipino" }, { id: "ja", flag: "🇯🇵", label: "日本語" }];
+    let currentLang = "en", currentDevice = null, currentLevel = null, currentBookFilter = 'all';
+    let gameState = { health: 5, score: 0, eaten: 0, trash: 0, streak: 0, bestStreak: 0, correct: 0, wrongAttempts: 0, currentFood: null, timeLeft: 0, timeMax: 10, timerInterval: null, gameActive: false, history: [], usedThisGame: new Set() };
+
+    const langGrid = document.getElementById("langGrid");
+    LANG_OPTIONS.forEach(opt => { const btn = document.createElement("button"); btn.className = "lang-btn"; btn.dataset.lang = opt.id; btn.innerHTML = `<span class="flag">${opt.flag}</span>${opt.label}`; btn.onclick = () => selectLang(opt.id); langGrid.appendChild(btn); });
+
+    function selectLang(lang) { currentLang = lang; document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang)); applyTranslations(); validateForm(); }
+    function selectDevice(dev) { currentDevice = dev; document.querySelectorAll(".device-card").forEach(c => c.classList.toggle("active", c.dataset.device === dev)); validateForm(); }
+    function selectLevel(lvl) { currentLevel = lvl; document.querySelectorAll(".level-card").forEach(c => c.classList.toggle("active", c.dataset.level === lvl)); validateForm(); }
+    function applyTranslations() {
+      const t = TRANSLATIONS[currentLang];
+      document.getElementById("tagline").innerText = t.tagline;
+      document.getElementById("lblName").innerText = t.playerName;
+      document.getElementById("lblLang").innerText = t.langLabel;
+      document.getElementById("lblDevice").innerText = t.deviceLabel;
+      document.getElementById("lblLevel").innerText = t.levelLabel;
+      document.getElementById("devPc").innerText = t.pc; document.getElementById("devPcSub").innerText = t.pcSub;
+      document.getElementById("devPh").innerText = t.phone; document.getElementById("devPhSub").innerText = t.phoneSub;
+      document.getElementById("lvlEasyName").innerText = t.easyName; document.getElementById("lvlEasyDesc").innerText = t.easyDesc;
+      document.getElementById("lvlNormalName").innerText = t.normalName; document.getElementById("lvlNormalDesc").innerText = t.normalDesc;
+      document.getElementById("lvlHardName").innerText = t.hardName; document.getElementById("lvlHardDesc").innerText = t.hardDesc;
+      document.getElementById("tagEasy").innerText = t.easyTag; document.getElementById("tagNormal").innerText = t.normalTag; document.getElementById("tagHard").innerText = t.hardTag;
+      document.getElementById("playBtn").innerText = t.play;
+      document.getElementById("bookBtn").innerText = t.bookBtn;
+      document.getElementById("noteBox").innerHTML = t.how;
+      document.getElementById("lbTitle").innerText = t.lbTitle;
+      document.getElementById("lbTitle2").innerText = t.lbTitle;
+      document.getElementById("overTitle").innerText = t.great;
+      document.getElementById("overSub").innerText = t.overSub;
+      document.getElementById("statScoreLbl").innerText = t.scoreLbl;
+      document.getElementById("statBestLevelLbl").innerText = t.bestLevelLbl;
+      document.getElementById("statTrashLbl").innerText = t.trashLbl;
+      document.getElementById("statLevelLbl").innerText = t.levelLbl;
+      document.getElementById("btnBackLobby").innerText = t.backLobby;
+      document.getElementById("leaveTxt").innerText = t.leave;
+      document.getElementById("spellInput").placeholder = t.inputPlaceholder;
+      document.getElementById("progTitle").innerText = t.progTitle;
+      document.getElementById("totalLabel").innerText = t.totalLabel;
+      document.getElementById("progHint").innerText = t.progHint;
+      document.getElementById("totalDesc").innerText = t.totalDesc;
+      document.getElementById("totalHint").innerText = t.totalHint;
+      document.getElementById("bookTitle").innerText = t.bookTitle;
+      document.getElementById("bookClose").innerText = t.bookClose;
+      document.getElementById("fAll").innerText = t.fAll;
+      document.getElementById("fEasy").innerText = t.fEasy;
+      document.getElementById("fNormal").innerText = t.fNormal;
+      document.getElementById("fHard").innerText = t.fHard;
+      document.getElementById("bookSearch").placeholder = t.bookSearch;
+      if (gameState.gameActive) updateHUD();
+      updateLeaderboardUI();
+      updatePlayerProgressBox();
+      if (document.getElementById("bookScreen").style.display === 'flex') renderBook(currentBookFilter, document.getElementById("bookSearch").value);
     }
-    const agg=map.get(key);
-    if(entry.bestEasy!==undefined) agg.bestEasy=Math.max(agg.bestEasy, entry.bestEasy||0);
-    if(entry.bestNormal!==undefined) agg.bestNormal=Math.max(agg.bestNormal, entry.bestNormal||0);
-    if(entry.bestHard!==undefined) agg.bestHard=Math.max(agg.bestHard, entry.bestHard||0);
-    if(entry.level && entry.score!==undefined){
-      if(entry.level==='easy') agg.bestEasy=Math.max(agg.bestEasy, entry.score);
-      if(entry.level==='normal') agg.bestNormal=Math.max(agg.bestNormal, entry.score);
-      if(entry.level==='hard') agg.bestHard=Math.max(agg.bestHard, entry.score);
+    document.getElementById("playerName").addEventListener("input", () => { validateForm(); updatePlayerProgressBox(); });
+    function validateForm() { const name = document.getElementById("playerName").value.trim(); const btn = document.getElementById("playBtn"); btn.disabled = !(name.length >= 2 && currentLang && currentDevice && currentLevel); }
+
+    function getRawLeaderboard() { try { return JSON.parse(localStorage.getItem("spellEatLeaderboard") || "[]"); } catch { return []; } }
+    function migrateLeaderboardIfNeeded() {
+      let raw = getRawLeaderboard();
+      if (raw.length === 0) return [];
+      const map = new Map();
+      raw.forEach(entry => {
+        if (!entry.name) return;
+        const key = entry.name.trim().toLowerCase(); if (!key) return;
+        if (!map.has(key)) {
+          map.set(key, { name: entry.name.trim(), bestEasy: 0, bestNormal: 0, bestHard: 0, total: 0, plays: 0, eaten: 0, trash: 0, device: entry.device || 'pc', lang: entry.lang || 'en', date: entry.date || new Date().toISOString() });
+        }
+        const agg = map.get(key);
+        if (entry.bestEasy !== undefined) agg.bestEasy = Math.max(agg.bestEasy, entry.bestEasy || 0);
+        if (entry.bestNormal !== undefined) agg.bestNormal = Math.max(agg.bestNormal, entry.bestNormal || 0);
+        if (entry.bestHard !== undefined) agg.bestHard = Math.max(agg.bestHard, entry.bestHard || 0);
+        if (entry.level && entry.score !== undefined) {
+          if (entry.level === 'easy') agg.bestEasy = Math.max(agg.bestEasy, entry.score);
+          if (entry.level === 'normal') agg.bestNormal = Math.max(agg.bestNormal, entry.score);
+          if (entry.level === 'hard') agg.bestHard = Math.max(agg.bestHard, entry.score);
+        }
+        agg.eaten = Math.max(agg.eaten, entry.eaten || 0);
+        agg.plays = (agg.plays || 0) + 1;
+        if (new Date(entry.date) > new Date(agg.date)) { agg.date = entry.date; agg.device = entry.device || agg.device; agg.lang = entry.lang || agg.lang; }
+      });
+      const newLB = [...map.values()].map(e => { e.total = (e.bestEasy || 0) + (e.bestNormal || 0) + (e.bestHard || 0); return e; }).filter(e => e.total > 0 || e.plays > 0);
+      const hasDuplicates = raw.length !== newLB.length; const hasOldFormat = raw.some(e => !e.hasOwnProperty('bestEasy'));
+      if (hasDuplicates || hasOldFormat) { localStorage.setItem("spellEatLeaderboard", JSON.stringify(newLB)); return newLB; }
+      return raw;
     }
-    agg.eaten=Math.max(agg.eaten, entry.eaten||0);
-    agg.plays=(agg.plays||0)+1;
-    if(new Date(entry.date) > new Date(agg.date)){agg.date=entry.date;agg.device=entry.device||agg.device;agg.lang=entry.lang||agg.lang;}
-  });
-  const newLB=[...map.values()].map(e=>{e.total=(e.bestEasy||0)+(e.bestNormal||0)+(e.bestHard||0);return e;}).filter(e=>e.total>0||e.plays>0);
-  const hasDuplicates=raw.length!==newLB.length; const hasOldFormat=raw.some(e=>!e.hasOwnProperty('bestEasy'));
-  if(hasDuplicates||hasOldFormat){localStorage.setItem("spellEatLeaderboard", JSON.stringify(newLB));return newLB;}
-  return raw;
-}
-function getLeaderboard(){return migrateLeaderboardIfNeeded();}
-function saveLeaderboard(lb){localStorage.setItem("spellEatLeaderboard", JSON.stringify(lb));}
-function findPlayerEntry(name){const lb=getLeaderboard();const key=name.trim().toLowerCase();return lb.find(e=>e.name.trim().toLowerCase()===key);}
-function upsertPlayerScore(playerName, level, score, meta={}){
-  let lb=getLeaderboard();const key=playerName.trim().toLowerCase();let entry=lb.find(e=>e.name.trim().toLowerCase()===key);
-  if(!entry){entry={name:playerName.trim(),bestEasy:0,bestNormal:0,bestHard:0,total:0,plays:0,eaten:0,trash:0,device:meta.device||'pc',lang:meta.lang||'en',date:new Date().toISOString()};lb.push(entry);}
-  let updated=false;
-  if(level==='easy' && score>entry.bestEasy){entry.bestEasy=score;updated=true;}
-  if(level==='normal' && score>entry.bestNormal){entry.bestNormal=score;updated=true;}
-  if(level==='hard' && score>entry.bestHard){entry.bestHard=score;updated=true;}
-  if(updated||entry.plays===0){entry.total=(entry.bestEasy||0)+(entry.bestNormal||0)+(entry.bestHard||0);entry.eaten=Math.max(entry.eaten||0,meta.eaten||0);entry.trash=Math.max(entry.trash||0,meta.trash||0);entry.device=meta.device||entry.device;entry.lang=meta.lang||entry.lang;entry.date=new Date().toISOString();}
-  entry.plays=(entry.plays||0)+1;saveLeaderboard(lb);return entry;
-}
-function updatePlayerProgressBox(){
-  const name=document.getElementById("playerName").value.trim();const box=document.getElementById("playerProgress");
-  if(name.length<2){box.classList.remove("show");return;}
-  const entry=findPlayerEntry(name);if(!entry){box.classList.remove("show");return;}
-  box.classList.add("show");
-  document.getElementById("progName").innerText=entry.name;
-  document.getElementById("progEasy").innerText=entry.bestEasy||0;
-  document.getElementById("progNormal").innerText=entry.bestNormal||0;
-  document.getElementById("progHard").innerText=entry.bestHard||0;
-  document.getElementById("progTotal").innerText=entry.total||0;
-}
-function updateLeaderboardUI(){
-  const lb=getLeaderboard().sort((a,b)=>(b.total||0)-(a.total||0)).slice(0,50);
-  const t=TRANSLATIONS[currentLang];
-  document.getElementById("lbCount").innerText=t.lbCount.replace("{n}", lb.length);
-  const render=(el)=>{
-    if(!el) return;el.innerHTML="";
-    if(lb.length===0){el.innerHTML=`<div style="text-align:center;padding:14px;opacity:0.5;font-weight:600">No players yet — be first! 🌱<br><small>Play all 3 levels to max total</small></div>`;return;}
-    lb.forEach((entry, idx)=>{
-      const row=document.createElement("div");row.className="leader-row "+(idx===0?"top1":idx===1?"top2":idx===2?"top3":"");
-      const rankIcon=idx===0?"🥇":idx===1?"🥈":idx===2?"🥉":`#${idx+1}`;
-      row.innerHTML=`<div class="rank">${rankIcon}</div><div><div style="font-weight:800">${escapeHtml(entry.name)} <span style="font-size:8px;background:#FFF3B0;border:1px solid #5D4037;border-radius:5px;padding:1px 4px">${entry.plays||1} plays</span></div><div class="leader-meta">${new Date(entry.date).toLocaleDateString()} • ${entry.lang.toUpperCase()}</div><div class="leader-breakdown">E:${entry.bestEasy||0} | N:${entry.bestNormal||0} | H:${entry.bestHard||0}</div></div><div class="leader-score">${entry.total||0}<div style="font-size:8px;opacity:0.6">TOTAL</div></div>`;
-      el.appendChild(row);
-    });
-  };
-  render(document.getElementById("leaderList"));render(document.getElementById("finalLeaderList"));
-}
-function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function clearLeaderboard(){if(confirm("Clear ALL progress?")){localStorage.removeItem("spellEatLeaderboard");updateLeaderboardUI();updatePlayerProgressBox();}}
+    function getLeaderboard() { return migrateLeaderboardIfNeeded(); }
+    function saveLeaderboard(lb) { localStorage.setItem("spellEatLeaderboard", JSON.stringify(lb)); }
+    function findPlayerEntry(name) { const lb = getLeaderboard(); const key = name.trim().toLowerCase(); return lb.find(e => e.name.trim().toLowerCase() === key); }
+    function upsertPlayerScore(playerName, level, score, meta = {}) {
+      let lb = getLeaderboard(); const key = playerName.trim().toLowerCase(); let entry = lb.find(e => e.name.trim().toLowerCase() === key);
+      if (!entry) { entry = { name: playerName.trim(), bestEasy: 0, bestNormal: 0, bestHard: 0, total: 0, plays: 0, eaten: 0, trash: 0, device: meta.device || 'pc', lang: meta.lang || 'en', date: new Date().toISOString() }; lb.push(entry); }
+      let updated = false;
+      if (level === 'easy' && score > entry.bestEasy) { entry.bestEasy = score; updated = true; }
+      if (level === 'normal' && score > entry.bestNormal) { entry.bestNormal = score; updated = true; }
+      if (level === 'hard' && score > entry.bestHard) { entry.bestHard = score; updated = true; }
+      if (updated || entry.plays === 0) { entry.total = (entry.bestEasy || 0) + (entry.bestNormal || 0) + (entry.bestHard || 0); entry.eaten = Math.max(entry.eaten || 0, meta.eaten || 0); entry.trash = Math.max(entry.trash || 0, meta.trash || 0); entry.device = meta.device || entry.device; entry.lang = meta.lang || entry.lang; entry.date = new Date().toISOString(); }
+      entry.plays = (entry.plays || 0) + 1; saveLeaderboard(lb); return entry;
+    }
+    function updatePlayerProgressBox() {
+      const name = document.getElementById("playerName").value.trim(); const box = document.getElementById("playerProgress");
+      if (name.length < 2) { box.classList.remove("show"); return; }
+      const entry = findPlayerEntry(name); if (!entry) { box.classList.remove("show"); return; }
+      box.classList.add("show");
+      document.getElementById("progName").innerText = entry.name;
+      document.getElementById("progEasy").innerText = entry.bestEasy || 0;
+      document.getElementById("progNormal").innerText = entry.bestNormal || 0;
+      document.getElementById("progHard").innerText = entry.bestHard || 0;
+      document.getElementById("progTotal").innerText = entry.total || 0;
+    }
+    function updateLeaderboardUI() {
+      const lb = getLeaderboard().sort((a, b) => (b.total || 0) - (a.total || 0)).slice(0, 50);
+      const t = TRANSLATIONS[currentLang];
+      document.getElementById("lbCount").innerText = t.lbCount.replace("{n}", lb.length);
+      const render = (el) => {
+        if (!el) return; el.innerHTML = "";
+        if (lb.length === 0) { el.innerHTML = `<div style="text-align:center;padding:14px;opacity:0.5;font-weight:600">No players yet — be first! 🌱<br><small>Play all 3 levels to max total</small></div>`; return; }
+        lb.forEach((entry, idx) => {
+          const row = document.createElement("div"); row.className = "leader-row " + (idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "");
+          const rankIcon = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`;
+          row.innerHTML = `<div class="rank">${rankIcon}</div><div><div style="font-weight:800">${escapeHtml(entry.name)} <span style="font-size:8px;background:#FFF3B0;border:1px solid #5D4037;border-radius:5px;padding:1px 4px">${entry.plays || 1} plays</span></div><div class="leader-meta">${new Date(entry.date).toLocaleDateString()} • ${entry.lang.toUpperCase()}</div><div class="leader-breakdown">E:${entry.bestEasy || 0} | N:${entry.bestNormal || 0} | H:${entry.bestHard || 0}</div></div><div class="leader-score">${entry.total || 0}<div style="font-size:8px;opacity:0.6">TOTAL</div></div>`;
+          el.appendChild(row);
+        });
+      };
+      render(document.getElementById("leaderList")); render(document.getElementById("finalLeaderList"));
+    }
+    function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+    function clearLeaderboard() { if (confirm("Clear ALL progress?")) { localStorage.removeItem("spellEatLeaderboard"); updateLeaderboardUI(); updatePlayerProgressBox(); } }
 
-function buildVirtualKeyboard(){
-  const kb=document.getElementById("virtualKb");kb.innerHTML="";
-  const rows=["qwertyuiop","asdfghjkl","zxcvbnm"];
-  rows.forEach(r=>{const rowDiv=document.createElement("div");rowDiv.className="kb-row";for(let ch of r){const k=document.createElement("button");k.className="kb-key";k.textContent=ch;k.onclick=()=>typeChar(ch);rowDiv.appendChild(k);}kb.appendChild(rowDiv);});
-  const lastRow=document.createElement("div");lastRow.className="kb-row";
-  const del=document.createElement("button");del.className="kb-key wide";del.textContent="⌫";del.onclick=()=>deleteChar();
-  const space=document.createElement("button");space.className="kb-key wide";space.style.flex="2";space.textContent="SPACE";space.onclick=()=>typeChar(" ");
-  const enter=document.createElement("button");enter.className="kb-key wide";enter.style.background="var(--green)";enter.style.color="white";enter.textContent="↵";enter.onclick=()=>submitAttempt();
-  lastRow.append(del,space,enter);kb.appendChild(lastRow);
-}
-function typeChar(ch){const inp=document.getElementById("spellInput");inp.value+=ch;inp.dispatchEvent(new Event("input"));inp.focus();}
-function deleteChar(){const inp=document.getElementById("spellInput");inp.value=inp.value.slice(0,-1);inp.dispatchEvent(new Event("input"));inp.focus();}
-function normalize(str){return str.toLowerCase().replace(/[^a-z0-9]/g,'');}
-function stopTimer(){if(gameState.timerInterval){clearInterval(gameState.timerInterval);gameState.timerInterval=null;}}
-function startGameFlow(){
-  const name=document.getElementById("playerName").value.trim();
-  if(name.length<2||!currentDevice||!currentLang||!currentLevel) return;
-  stopTimer();
-  gameState={health:5,score:0,eaten:0,trash:0,streak:0,bestStreak:0,correct:0,wrongAttempts:0,currentFood:null,timeLeft:0,timeMax:10,timerInterval:null,gameActive:true,history:[],usedThisGame:new Set(),playerName:name,lang:currentLang,device:currentDevice,level:currentLevel,startTime:Date.now()};
-  document.getElementById("lobby").style.display="none";document.getElementById("gameOver").style.display="none";document.getElementById("gameScreen").style.display="flex";
-  if(currentDevice==="phone"){document.getElementById("gameScreen").classList.add("phone-mode");buildVirtualKeyboard();}else{document.getElementById("gameScreen").classList.remove("phone-mode");}
-  updateHUD();nextFood();document.getElementById("spellInput").value="";document.getElementById("spellInput").focus();initAudio();
-}
-function getCurrentFoodPool(){return LEVEL_FOODS[currentLevel||"easy"]||LEVEL_FOODS.easy;}
-function getRandomFood(){
-  const pool=getCurrentFoodPool();
-  let available=pool.filter(f=>!gameState.usedThisGame.has(f.name));
-  if(available.length===0){gameState.usedThisGame.clear();available=pool;}
-  const pick=available[Math.floor(Math.random()*available.length)];
-  gameState.usedThisGame.add(pick.name);
-  return pick;
-}
-function nextFood(){
-  stopTimer();
-  const food=getRandomFood();gameState.currentFood=food;
-  let baseTime=currentLevel==="easy"?10:currentLevel==="normal"?8:6.5;
-  const timeMax=Math.max(currentLevel==="hard"?3.2:4, baseTime - gameState.eaten*0.25);
-  gameState.timeMax=timeMax;gameState.timeLeft=timeMax;
-  const foodDisplay=document.getElementById("foodDisplay");
-  const emojiEl=document.getElementById("foodEmoji");
-  const imgEl=document.getElementById("foodImg");
-  foodDisplay.className="food-display";
-  if(food.img){
-    emojiEl.style.display="none";imgEl.style.display="block";imgEl.onerror=()=>{imgEl.style.display="none";emojiEl.style.display="block";emojiEl.textContent=food.emoji;};imgEl.src=food.img;
-  }else{imgEl.style.display="none";emojiEl.style.display="block";emojiEl.textContent=food.emoji;}
-  document.getElementById("spellInput").value="";document.getElementById("feedback").textContent="";document.getElementById("feedback").className="feedback";buildHint("");updateHUD();
-  document.getElementById("progressFill").style.width="100%";document.getElementById("progressFill").classList.remove("warn");
-  gameState.timerInterval=setInterval(()=>{gameState.timeLeft-=0.05;if(gameState.timeLeft<=0){gameState.timeLeft=0;handleFail();}updateTimerBar();},50);
-  document.getElementById("spellInput").focus();
-}
-function updateTimerBar(){
-  const pct=(gameState.timeLeft/gameState.timeMax)*100;
-  const fill=document.getElementById("progressFill");fill.style.width=pct+"%";if(pct<30) fill.classList.add("warn"); else fill.classList.remove("warn");
-  document.getElementById("timerTxt").textContent=gameState.timeLeft.toFixed(1)+"s";
-}
-function updateHUD(){
-  const t=TRANSLATIONS[currentLang];
-  const heartsEl=document.getElementById("hearts");let hStr="";for(let i=0;i<5;i++){hStr+=`<span class="${i>=gameState.health?'lost':''}">❤️</span>`;}heartsEl.innerHTML=hStr;
-  document.getElementById("scoreTxt").innerText=t.score.replace("{n}", gameState.score);
-  document.getElementById("eatenTxt").innerText=t.eaten.replace("{n}", gameState.eaten);
-  document.getElementById("trashCount").innerText=t.trash.replace("{n}", gameState.trash);
-  document.getElementById("levelHud").innerText=(gameState.level||currentLevel||"").toUpperCase()+" MODE";
-  const lvlColors={easy:"#C6F5D1",normal:"#FFE9A8",hard:"#FFB4B4"};document.getElementById("levelHud").style.background=lvlColors[gameState.level||currentLevel]||"var(--brown)";document.getElementById("levelHud").style.color="var(--brown)";
-  updateTimerBar();
-}
-function buildHint(currentInput){
-  const hintEl=document.getElementById("wordHint");hintEl.innerHTML="";if(!gameState.currentFood) return;
-  const target=gameState.currentFood.name;
-  const normInput=normalize(currentInput);
-  for(let i=0;i<target.length;i++){const box=document.createElement("div");box.className="letter-box";const actualChar=normInput[i];if(actualChar){box.textContent=actualChar;box.classList.add("filled");if(actualChar!==target[i]){box.classList.add("wrong");}}else{box.textContent="";}hintEl.appendChild(box);}
-}
-const spellInput=document.getElementById("spellInput");
-spellInput.addEventListener("input",(e)=>{const val=e.target.value;buildHint(val.toLowerCase());if(!gameState.currentFood) return;if(normalize(val)===normalize(gameState.currentFood.name)){handleSuccess();}});
-spellInput.addEventListener("keydown",(e)=>{if(e.key==="Enter"){submitAttempt();}});
-function submitAttempt(){
-  const val=spellInput.value.trim();if(!val||!gameState.currentFood) return;
-  if(normalize(val)===normalize(gameState.currentFood.name)){handleSuccess();}else{
-    gameState.wrongAttempts++;gameState.streak=0;const t=TRANSLATIONS[currentLang];const msg=t.feedbackBad[Math.floor(Math.random()*t.feedbackBad.length)];
-    showFeedback(msg+" — "+val+" ❌","bad");playSound("wrong");
-    document.getElementById("wordHint").animate([{transform:"translateX(0)"},{transform:"translateX(-8px)"},{transform:"translateX(8px)"},{transform:"translateX(0)"}],{duration:280});
-    gameState.timeLeft=Math.max(0, gameState.timeLeft-1.0);
-  }
-}
-function showFeedback(txt,type){const fb=document.getElementById("feedback");fb.textContent=txt;fb.className="feedback "+type;}
-function calculatePoints(){const cfg=SCORING[gameState.level||'easy'];return Math.max(1, Math.floor(cfg.base + (gameState.timeLeft*cfg.timeMul) + (gameState.streak*cfg.streakMul)));}
-function handleSuccess(){
-  stopTimer();gameState.eaten++;gameState.correct++;gameState.streak++;if(gameState.streak>gameState.bestStreak) gameState.bestStreak=gameState.streak;
-  const points=calculatePoints();gameState.score+=points;gameState.history.push({food:gameState.currentFood.name, result:"eaten", points});
-  const t=TRANSLATIONS[currentLang];const msg=t.feedbackGood[Math.floor(Math.random()*t.feedbackGood.length)];showFeedback(msg+" +"+points,"ok");playSound("eat");
-  document.getElementById("foodDisplay").classList.add("eating");setTimeout(()=>nextFood(), 460);updateHUD();
-}
-function handleFail(){
-  stopTimer();gameState.trash++;gameState.health=Math.max(0,gameState.health-1);gameState.streak=0;
-  const t=TRANSLATIONS[currentLang];showFeedback(t.timeUp+" ("+gameState.currentFood.name+")","bad");playSound("trash");
-  document.getElementById("foodDisplay").classList.add("trashing");
-  document.getElementById("trashBin").classList.add("active");setTimeout(()=>document.getElementById("trashBin").classList.remove("active"),350);
-  updateHUD();if(gameState.health<=0){setTimeout(()=>endGame(), 700);}else{setTimeout(()=>nextFood(), 750);}
-}
-function endGame(){
-  stopTimer();gameState.gameActive=false;
-  const entry=upsertPlayerScore(gameState.playerName, gameState.level, gameState.score, {eaten:gameState.eaten, trash:gameState.trash, device:gameState.device, lang:gameState.lang});
-  document.getElementById("gameScreen").style.display="none";document.getElementById("gameOver").style.display="flex";
-  document.getElementById("statScore").innerText=gameState.score;
-  document.getElementById("statBestLevel").innerText= gameState.level==='easy'?entry.bestEasy : gameState.level==='normal'?entry.bestNormal : entry.bestHard;
-  document.getElementById("statTrash").innerText=gameState.trash;
-  document.getElementById("statTotal").innerText=entry.total;
-  document.getElementById("totalEasy").innerText=entry.bestEasy||0;
-  document.getElementById("totalNormal").innerText=entry.bestNormal||0;
-  document.getElementById("totalHard").innerText=entry.bestHard||0;
-  document.getElementById("overEmoji").textContent= (gameState.score>=(gameState.level==='easy'?entry.bestEasy:gameState.level==='normal'?entry.bestNormal:entry.bestHard)) ? "🎉" : "🙂";
-  updateLeaderboardUI();updatePlayerProgressBox();playSound("gameover");
-}
-function leaveGame(){const t=TRANSLATIONS[currentLang];if(!gameState.gameActive){stopTimer();backToLobby();return;}if(confirm(t.leave+"?")){if(gameState.eaten>0||gameState.score>0){endGame();}else{stopTimer();backToLobby();}}}
-function backToLobby(){stopTimer();gameState.gameActive=false;document.getElementById("gameOver").style.display="none";document.getElementById("gameScreen").style.display="none";document.getElementById("lobby").style.display="flex";updateLeaderboardUI();updatePlayerProgressBox();}
-let audioCtx=null;function initAudio(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch{}}
-function playSound(type){if(!audioCtx) return;try{const osc=audioCtx.createOscillator();const gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);const now=audioCtx.currentTime;if(type==="eat"){osc.frequency.setValueAtTime(600,now);osc.frequency.linearRampToValueAtTime(900,now+0.15);gain.gain.setValueAtTime(0.25,now);gain.gain.exponentialRampToValueAtTime(0.01,now+0.2);osc.start(now);osc.stop(now+0.2);}else if(type==="wrong"){osc.frequency.setValueAtTime(250,now);osc.frequency.linearRampToValueAtTime(150,now+0.2);gain.gain.setValueAtTime(0.25,now);gain.gain.exponentialRampToValueAtTime(0.01,now+0.25);osc.start(now);osc.stop(now+0.25);}else if(type==="trash"){osc.frequency.setValueAtTime(400,now);osc.frequency.linearRampToValueAtTime(80,now+0.35);gain.gain.setValueAtTime(0.35,now);gain.gain.exponentialRampToValueAtTime(0.01,now+0.4);osc.start(now);osc.stop(now+0.4);}else if(type==="gameover"){osc.frequency.setValueAtTime(500,now);osc.frequency.linearRampToValueAtTime(200,now+0.6);gain.gain.setValueAtTime(0.35,now);gain.gain.exponentialRampToValueAtTime(0.01,now+0.7);osc.start(now);osc.stop(now+0.7);}}catch(e){}}
+    function buildVirtualKeyboard() {
+      const kb = document.getElementById("virtualKb"); kb.innerHTML = "";
+      const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+      rows.forEach(r => { const rowDiv = document.createElement("div"); rowDiv.className = "kb-row"; for (let ch of r) { const k = document.createElement("button"); k.className = "kb-key"; k.textContent = ch; k.onclick = () => typeChar(ch); rowDiv.appendChild(k); } kb.appendChild(rowDiv); });
+      const lastRow = document.createElement("div"); lastRow.className = "kb-row";
+      const del = document.createElement("button"); del.className = "kb-key wide"; del.textContent = "⌫"; del.onclick = () => deleteChar();
+      const space = document.createElement("button"); space.className = "kb-key wide"; space.style.flex = "2"; space.textContent = "SPACE"; space.onclick = () => typeChar(" ");
+      const enter = document.createElement("button"); enter.className = "kb-key wide"; enter.style.background = "var(--green)"; enter.style.color = "white"; enter.textContent = "↵"; enter.onclick = () => submitAttempt();
+      lastRow.append(del, space, enter); kb.appendChild(lastRow);
+    }
+    function typeChar(ch) { const inp = document.getElementById("spellInput"); inp.value += ch; inp.dispatchEvent(new Event("input")); inp.focus(); }
+    function deleteChar() { const inp = document.getElementById("spellInput"); inp.value = inp.value.slice(0, -1); inp.dispatchEvent(new Event("input")); inp.focus(); }
+    function normalize(str) { return str.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function stopTimer() { if (gameState.timerInterval) { clearInterval(gameState.timerInterval); gameState.timerInterval = null; } }
+    function startGameFlow() {
+      const name = document.getElementById("playerName").value.trim();
+      if (name.length < 2 || !currentDevice || !currentLang || !currentLevel) return;
+      stopTimer();
+      gameState = { health: 5, score: 0, eaten: 0, trash: 0, streak: 0, bestStreak: 0, correct: 0, wrongAttempts: 0, currentFood: null, timeLeft: 0, timeMax: 10, timerInterval: null, gameActive: true, history: [], usedThisGame: new Set(), playerName: name, lang: currentLang, device: currentDevice, level: currentLevel, startTime: Date.now() };
+      document.getElementById("lobby").style.display = "none"; document.getElementById("gameOver").style.display = "none"; document.getElementById("gameScreen").style.display = "flex";
+      if (currentDevice === "phone") { document.getElementById("gameScreen").classList.add("phone-mode"); buildVirtualKeyboard(); } else { document.getElementById("gameScreen").classList.remove("phone-mode"); }
+      updateHUD(); nextFood(); document.getElementById("spellInput").value = ""; document.getElementById("spellInput").focus(); initAudio();
+    }
+    function getCurrentFoodPool() { return LEVEL_FOODS[currentLevel || "easy"] || LEVEL_FOODS.easy; }
+    function getRandomFood() {
+      const pool = getCurrentFoodPool();
+      let available = pool.filter(f => !gameState.usedThisGame.has(f.name));
+      if (available.length === 0) { gameState.usedThisGame.clear(); available = pool; }
+      const pick = available[Math.floor(Math.random() * available.length)];
+      gameState.usedThisGame.add(pick.name);
+      return pick;
+    }
+    function nextFood() {
+      stopTimer();
+      const food = getRandomFood(); gameState.currentFood = food;
+      let baseTime = currentLevel === "easy" ? 10 : currentLevel === "normal" ? 8 : 6.5;
+      const timeMax = Math.max(currentLevel === "hard" ? 3.2 : 4, baseTime - gameState.eaten * 0.25);
+      gameState.timeMax = timeMax; gameState.timeLeft = timeMax;
+      const foodDisplay = document.getElementById("foodDisplay");
+      const emojiEl = document.getElementById("foodEmoji");
+      const imgEl = document.getElementById("foodImg");
+      foodDisplay.className = "food-display";
+      if (food.img) {
+        emojiEl.style.display = "none"; imgEl.style.display = "block"; imgEl.onerror = () => { imgEl.style.display = "none"; emojiEl.style.display = "block"; emojiEl.textContent = food.emoji; }; imgEl.src = food.img;
+      } else { imgEl.style.display = "none"; emojiEl.style.display = "block"; emojiEl.textContent = food.emoji; }
+      document.getElementById("spellInput").value = ""; document.getElementById("feedback").textContent = ""; document.getElementById("feedback").className = "feedback"; buildHint(""); updateHUD();
+      document.getElementById("progressFill").style.width = "100%"; document.getElementById("progressFill").classList.remove("warn");
+      gameState.timerInterval = setInterval(() => { gameState.timeLeft -= 0.05; if (gameState.timeLeft <= 0) { gameState.timeLeft = 0; handleFail(); } updateTimerBar(); }, 50);
+      document.getElementById("spellInput").focus();
+    }
+    function updateTimerBar() {
+      const pct = (gameState.timeLeft / gameState.timeMax) * 100;
+      const fill = document.getElementById("progressFill"); fill.style.width = pct + "%"; if (pct < 30) fill.classList.add("warn"); else fill.classList.remove("warn");
+      document.getElementById("timerTxt").textContent = gameState.timeLeft.toFixed(1) + "s";
+    }
+    function updateHUD() {
+      const t = TRANSLATIONS[currentLang];
+      const heartsEl = document.getElementById("hearts"); let hStr = ""; for (let i = 0; i < 5; i++) { hStr += `<span class="${i >= gameState.health ? 'lost' : ''}">❤️</span>`; } heartsEl.innerHTML = hStr;
+      document.getElementById("scoreTxt").innerText = t.score.replace("{n}", gameState.score);
+      document.getElementById("eatenTxt").innerText = t.eaten.replace("{n}", gameState.eaten);
+      document.getElementById("trashCount").innerText = t.trash.replace("{n}", gameState.trash);
+      document.getElementById("levelHud").innerText = (gameState.level || currentLevel || "").toUpperCase() + " MODE";
+      const lvlColors = { easy: "#C6F5D1", normal: "#FFE9A8", hard: "#FFB4B4" }; document.getElementById("levelHud").style.background = lvlColors[gameState.level || currentLevel] || "var(--brown)"; document.getElementById("levelHud").style.color = "var(--brown)";
+      updateTimerBar();
+    }
+    function buildHint(currentInput) {
+      const hintEl = document.getElementById("wordHint"); hintEl.innerHTML = ""; if (!gameState.currentFood) return;
+      const target = gameState.currentFood.name;
+      const normInput = normalize(currentInput);
+      for (let i = 0; i < target.length; i++) { const box = document.createElement("div"); box.className = "letter-box"; const actualChar = normInput[i]; if (actualChar) { box.textContent = actualChar; box.classList.add("filled"); if (actualChar !== target[i]) { box.classList.add("wrong"); } } else { box.textContent = ""; } hintEl.appendChild(box); }
+    }
+    const spellInput = document.getElementById("spellInput");
+    spellInput.addEventListener("input", (e) => { const val = e.target.value; buildHint(val.toLowerCase()); if (!gameState.currentFood) return; if (normalize(val) === normalize(gameState.currentFood.name)) { handleSuccess(); } });
+    spellInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { submitAttempt(); } });
+    function submitAttempt() {
+      const val = spellInput.value.trim(); if (!val || !gameState.currentFood) return;
+      if (normalize(val) === normalize(gameState.currentFood.name)) { handleSuccess(); } else {
+        gameState.wrongAttempts++; gameState.streak = 0; const t = TRANSLATIONS[currentLang]; const msg = t.feedbackBad[Math.floor(Math.random() * t.feedbackBad.length)];
+        showFeedback(msg + " — " + val + " ❌", "bad"); playSound("wrong");
+        document.getElementById("wordHint").animate([{ transform: "translateX(0)" }, { transform: "translateX(-8px)" }, { transform: "translateX(8px)" }, { transform: "translateX(0)" }], { duration: 280 });
+        gameState.timeLeft = Math.max(0, gameState.timeLeft - 1.0);
+      }
+    }
+    function showFeedback(txt, type) { const fb = document.getElementById("feedback"); fb.textContent = txt; fb.className = "feedback " + type; }
+    function calculatePoints() { const cfg = SCORING[gameState.level || 'easy']; return Math.max(1, Math.floor(cfg.base + (gameState.timeLeft * cfg.timeMul) + (gameState.streak * cfg.streakMul))); }
+    function handleSuccess() {
+      stopTimer(); gameState.eaten++; gameState.correct++; gameState.streak++; if (gameState.streak > gameState.bestStreak) gameState.bestStreak = gameState.streak;
+      const points = calculatePoints(); gameState.score += points; gameState.history.push({ food: gameState.currentFood.name, result: "eaten", points });
+      const t = TRANSLATIONS[currentLang]; const msg = t.feedbackGood[Math.floor(Math.random() * t.feedbackGood.length)]; showFeedback(msg + " +" + points, "ok"); playSound("eat");
+      document.getElementById("foodDisplay").classList.add("eating"); setTimeout(() => nextFood(), 460); updateHUD();
+    }
+    function handleFail() {
+      stopTimer(); gameState.trash++; gameState.health = Math.max(0, gameState.health - 1); gameState.streak = 0;
+      const t = TRANSLATIONS[currentLang]; showFeedback(t.timeUp + " (" + gameState.currentFood.name + ")", "bad"); playSound("trash");
+      document.getElementById("foodDisplay").classList.add("trashing");
+      document.getElementById("trashBin").classList.add("active"); setTimeout(() => document.getElementById("trashBin").classList.remove("active"), 350);
+      updateHUD(); if (gameState.health <= 0) { setTimeout(() => endGame(), 700); } else { setTimeout(() => nextFood(), 750); }
+    }
+    function endGame() {
+      stopTimer(); gameState.gameActive = false;
+      const entry = upsertPlayerScore(gameState.playerName, gameState.level, gameState.score, { eaten: gameState.eaten, trash: gameState.trash, device: gameState.device, lang: gameState.lang });
+      document.getElementById("gameScreen").style.display = "none"; document.getElementById("gameOver").style.display = "flex";
+      document.getElementById("statScore").innerText = gameState.score;
+      document.getElementById("statBestLevel").innerText = gameState.level === 'easy' ? entry.bestEasy : gameState.level === 'normal' ? entry.bestNormal : entry.bestHard;
+      document.getElementById("statTrash").innerText = gameState.trash;
+      document.getElementById("statTotal").innerText = entry.total;
+      document.getElementById("totalEasy").innerText = entry.bestEasy || 0;
+      document.getElementById("totalNormal").innerText = entry.bestNormal || 0;
+      document.getElementById("totalHard").innerText = entry.bestHard || 0;
+      document.getElementById("overEmoji").textContent = (gameState.score >= (gameState.level === 'easy' ? entry.bestEasy : gameState.level === 'normal' ? entry.bestNormal : entry.bestHard)) ? "🎉" : "🙂";
+      updateLeaderboardUI(); updatePlayerProgressBox(); playSound("gameover");
+    }
+    function leaveGame() { const t = TRANSLATIONS[currentLang]; if (!gameState.gameActive) { stopTimer(); backToLobby(); return; } if (confirm(t.leave + "?")) { if (gameState.eaten > 0 || gameState.score > 0) { endGame(); } else { stopTimer(); backToLobby(); } } }
+    function backToLobby() { stopTimer(); gameState.gameActive = false; document.getElementById("gameOver").style.display = "none"; document.getElementById("gameScreen").style.display = "none"; document.getElementById("lobby").style.display = "flex"; updateLeaderboardUI(); updatePlayerProgressBox(); }
+    let audioCtx = null; function initAudio() { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch { } }
+    function playSound(type) { if (!audioCtx) return; try { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); const now = audioCtx.currentTime; if (type === "eat") { osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(900, now + 0.15); gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2); osc.start(now); osc.stop(now + 0.2); } else if (type === "wrong") { osc.frequency.setValueAtTime(250, now); osc.frequency.linearRampToValueAtTime(150, now + 0.2); gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25); osc.start(now); osc.stop(now + 0.25); } else if (type === "trash") { osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(80, now + 0.35); gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === "gameover") { osc.frequency.setValueAtTime(500, now); osc.frequency.linearRampToValueAtTime(200, now + 0.6); gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7); osc.start(now); osc.stop(now + 0.7); } } catch (e) { } }
 
-// ===== BOOK FUNCTIONS =====
-function openBook(){document.getElementById("bookScreen").style.display="flex";renderBook(currentBookFilter, document.getElementById("bookSearch").value);}
-function closeBook(){document.getElementById("bookScreen").style.display="none";}
-function filterBook(filter){
-  currentBookFilter=filter;
-  document.querySelectorAll(".book-tab").forEach(b=>b.classList.toggle("active", b.dataset.filter===filter));
-  renderBook(filter, document.getElementById("bookSearch").value);
-}
-function renderBook(filter, search=''){
-  const grid=document.getElementById("bookGrid");
-  grid.innerHTML='';
-  let items=[];
-  if(filter==='all'){items=[...LEVEL_FOODS.easy,...LEVEL_FOODS.normal,...LEVEL_FOODS.hard];}
-  else{items=LEVEL_FOODS[filter]||[];}
-  // dedupe by name
-  const map=new Map();
-  items.forEach(f=>{if(!map.has(f.name)) map.set(f.name,f); else { // keep one with img if possible
-    const existing=map.get(f.name);
-    if(!existing.img && f.img) map.set(f.name,f);
-  }});
-  let list=[...map.values()];
-  if(search){const s=search.toLowerCase().trim(); if(s) list=list.filter(f=>f.name.includes(s) || (f.display&&f.display.toLowerCase().includes(s))); }
-  list.sort((a,b)=>a.name.localeCompare(b.name));
-  list.forEach(food=>{
-    const card=document.createElement("div");card.className="book-card";
-    let lvl='easy';
-    if(LEVEL_FOODS.hard.some(h=>h.name===food.name)) lvl='hard'; else if(LEVEL_FOODS.normal.some(n=>n.name===food.name)) lvl='normal';
-    let imgHTML='';
-    if(food.img){imgHTML=`<img src="${food.img}" alt="${food.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.b-emoji').style.display='block'"><div class="b-emoji" style="display:none">${food.emoji}</div>`;}
-    else{imgHTML=`<div class="b-emoji">${food.emoji}</div>`;}
-    card.innerHTML=`${imgHTML}<b>${food.display||food.name}</b><span class="lvl ${lvl}">${lvl.toUpperCase()}</span><div style="font-size:9px;opacity:0.5;margin-top:2px">${food.name}</div>`;
-    grid.appendChild(card);
-  });
-  const t=TRANSLATIONS[currentLang];
-  document.getElementById("bookCount").innerText=t.bookCount.replace("{n}", list.length);
-}
+    // ===== BOOK FUNCTIONS =====
+    function openBook() { document.getElementById("bookScreen").style.display = "flex"; renderBook(currentBookFilter, document.getElementById("bookSearch").value); }
+    function closeBook() { document.getElementById("bookScreen").style.display = "none"; }
+    function filterBook(filter) {
+      currentBookFilter = filter;
+      document.querySelectorAll(".book-tab").forEach(b => b.classList.toggle("active", b.dataset.filter === filter));
+      renderBook(filter, document.getElementById("bookSearch").value);
+    }
+    function renderBook(filter, search = '') {
+      const grid = document.getElementById("bookGrid");
+      grid.innerHTML = '';
+      let items = [];
+      if (filter === 'all') { items = [...LEVEL_FOODS.easy, ...LEVEL_FOODS.normal, ...LEVEL_FOODS.hard]; }
+      else { items = LEVEL_FOODS[filter] || []; }
+      // dedupe by name
+      const map = new Map();
+      items.forEach(f => {
+        if (!map.has(f.name)) map.set(f.name, f); else { // keep one with img if possible
+          const existing = map.get(f.name);
+          if (!existing.img && f.img) map.set(f.name, f);
+        }
+      });
+      let list = [...map.values()];
+      if (search) { const s = search.toLowerCase().trim(); if (s) list = list.filter(f => f.name.includes(s) || (f.display && f.display.toLowerCase().includes(s))); }
+      list.sort((a, b) => a.name.localeCompare(b.name));
+      list.forEach(food => {
+        const card = document.createElement("div"); card.className = "book-card";
+        let lvl = 'easy';
+        if (LEVEL_FOODS.hard.some(h => h.name === food.name)) lvl = 'hard'; else if (LEVEL_FOODS.normal.some(n => n.name === food.name)) lvl = 'normal';
+        let imgHTML = '';
+        if (food.img) { imgHTML = `<img src="${food.img}" alt="${food.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.b-emoji').style.display='block'"><div class="b-emoji" style="display:none">${food.emoji}</div>`; }
+        else { imgHTML = `<div class="b-emoji">${food.emoji}</div>`; }
+        card.innerHTML = `${imgHTML}<b>${food.display || food.name}</b><span class="lvl ${lvl}">${lvl.toUpperCase()}</span><div style="font-size:9px;opacity:0.5;margin-top:2px">${food.name}</div>`;
+        grid.appendChild(card);
+      });
+      const t = TRANSLATIONS[currentLang];
+      document.getElementById("bookCount").innerText = t.bookCount.replace("{n}", list.length);
+    }
 
-applyTranslations();
-selectLang("en");
-filterBook('all');
-</script>
-<footer class="site-footer">Made By: <span>Zian Mondejar</span> 2026</footer>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f8b3ce4985aaa3',t:'MTc4NDc4ODkxNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    applyTranslations();
+    selectLang("en");
+    filterBook('all');
+  </script>
+  <footer class="site-footer">Made By: <span>Zian Mondejar</span> 2026</footer>
+  <script type="module"
+    src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+    integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+    data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}'
+    crossorigin="anonymous"></script>
+  <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'a1f8b3ce4985aaa3',t:'MTc4NDc4ODkxNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
 </html>
